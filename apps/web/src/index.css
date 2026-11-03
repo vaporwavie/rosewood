@@ -1315,6 +1315,100 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(rosewood
   }
 }
 
+/* Rosewood's default palette. Scoped to the unthemed root so every picked theme paints as authored. */
+html:not([data-theme-id]) {
+  --color-zinc-25: oklch(0.984 0.006 35);
+  --color-neutral-25: oklch(0.984 0.006 35);
+  --color-zinc-50: oklch(0.97 0.009 35);
+  --color-neutral-50: oklch(0.97 0.009 35);
+  --color-zinc-100: oklch(0.95 0.012 35);
+  --color-neutral-100: oklch(0.95 0.012 35);
+  --color-zinc-200: oklch(0.905 0.016 35);
+  --color-neutral-200: oklch(0.905 0.016 35);
+  --color-zinc-300: oklch(0.86 0.02 35);
+  --color-neutral-300: oklch(0.86 0.02 35);
+  --color-zinc-400: oklch(0.7 0.024 35);
+  --color-neutral-400: oklch(0.7 0.024 35);
+  --color-zinc-500: oklch(0.55 0.03 35);
+  --color-neutral-500: oklch(0.55 0.03 35);
+  --color-zinc-600: oklch(0.44 0.03 35);
+  --color-neutral-600: oklch(0.44 0.03 35);
+  --color-zinc-700: oklch(0.37 0.028 35);
+  --color-neutral-700: oklch(0.37 0.028 35);
+  --color-zinc-800: oklch(0.27 0.024 35);
+  --color-neutral-800: oklch(0.27 0.024 35);
+  --color-zinc-900: oklch(0.21 0.022 35);
+  --color-neutral-900: oklch(0.21 0.022 35);
+  --color-zinc-950: oklch(0.15 0.018 35);
+  --color-neutral-950: oklch(0.15 0.018 35);
+  --card: oklch(0.995 0.003 35);
+  --popover: oklch(0.995 0.003 35);
+  --primary: oklch(0.42 0.135 18);
+  --message-surface: oklch(0.925 0.016 35);
+  --sidebar-row-active: var(--card);
+  --sidebar-row-selected: var(--card);
+  --terminal-cursor: oklch(0.42 0.135 18);
+  --terminal-selection-background: oklch(0.42 0.135 18 / 20%);
+
+  --stage-art-top: oklch(0.55 0.13 15);
+  --stage-art-mid: oklch(0.44 0.13 18);
+  --stage-art-bottom: oklch(0.32 0.1 20);
+  --stage-art-highlight: oklch(0.95 0.03 25);
+  --stage-art-secondary: oklch(0.78 0.09 15);
+  --stage-art-tertiary: oklch(0.68 0.12 5);
+  --stage-art-line: oklch(0.95 0.025 25);
+  --stage-art-celeste-highlight: oklch(0.96 0.03 40);
+  --stage-art-celeste-secondary: oklch(0.82 0.07 35);
+  --stage-art-violet-highlight: oklch(0.9 0.04 5);
+  --stage-art-grid-line: oklch(0.96 0.015 30);
+  --stage-night-base-top: oklch(0.25 0.05 20);
+  --stage-night-base-mid: oklch(0.2 0.035 28);
+  --stage-night-base-bottom: oklch(0.17 0.025 35);
+  --stage-night-highlight: oklch(0.72 0.1 15);
+  --stage-night-secondary: oklch(0.58 0.11 10);
+  --stage-night-tertiary: oklch(0.6 0.13 0);
+  --stage-night-line: oklch(0.94 0.025 20);
+  --stage-night-glow-highlight: oklch(0.52 0.12 15);
+  --stage-night-glow-secondary: oklch(0.33 0.07 20);
+  --stage-night-sparkle: oklch(0.88 0.05 15);
+
+  @variant dark {
+    --stage-art-top: oklch(0.46 0.12 18);
+    --stage-art-mid: oklch(0.36 0.11 18);
+    --stage-art-bottom: oklch(0.24 0.07 22);
+    --background: oklch(0.16 0.018 35);
+    --surface-raised: oklch(0.19 0.02 35);
+    --card: oklch(0.19 0.02 35);
+    --popover: oklch(0.19 0.02 35);
+    --primary: oklch(0.54 0.155 18);
+    --message-surface: oklch(0.245 0.022 35);
+    --update-foreground: oklch(0.8 0.09 18);
+    --sidebar: oklch(0.135 0.016 35);
+    --sidebar-stage-fade: var(--sidebar);
+    --sidebar-row-active: var(--accent);
+    --sidebar-row-selected: var(--muted);
+    --terminal-cursor: oklch(0.84 0.075 18);
+    --terminal-selection-background: oklch(0.84 0.075 18 / 25%);
+  }
+}
+
+html:not([data-theme-id]) [data-app-sidebar] {
+  --card: oklch(0.995 0.003 35);
+  --sidebar-row-active: var(--card);
+  --sidebar-row-selected: var(--card);
+
+  @variant dark {
+    --background: oklch(0.135 0.016 35);
+    --foreground: oklch(0.93 0.014 35);
+    --card: oklch(0.135 0.016 35);
+    --accent: oklch(0.25 0.024 35);
+    --accent-foreground: oklch(0.945 0.012 35);
+    --muted: oklch(0.16 0.018 35);
+    --muted-foreground: oklch(0.71 0.022 35);
+    --secondary-label: oklch(0.66 0.022 35);
+  }
+}
+
 /* Theme files are expressed in app color roles and mapped to the existing
    semantic surface tokens here. Keep this block after the sidebar-version
    compatibility overrides so both navigation implementations receive the

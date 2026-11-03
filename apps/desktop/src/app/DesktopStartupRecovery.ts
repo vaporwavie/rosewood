@@ -255,7 +255,7 @@ export const listen: Effect.Effect<
           show: false,
           title: "Rosewood could not start",
           autoHideMenuBar: true,
-          backgroundColor: shouldUseDarkColors ? "#000000" : "#ffffff",
+          backgroundColor: shouldUseDarkColors ? "#140a08" : "#fef8f7",
           webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,

@@ -34,7 +34,7 @@
   --rosewood-foreground: oklch(0.269 0 0);
   --rosewood-popover: white;
   --rosewood-popover-foreground: oklch(0.269 0 0);
-  --rosewood-primary: oklch(0.488 0.217 264);
+  --rosewood-primary: oklch(0.42 0.135 18);
   --rosewood-primary-foreground: white;
   --rosewood-muted: rgb(0 0 0 / 4%);
   --rosewood-muted-foreground: oklch(0.556 0 0);
@@ -42,7 +42,7 @@
   --rosewood-accent-foreground: oklch(0.269 0 0);
   --rosewood-border: rgb(0 0 0 / 8%);
   --rosewood-input: rgb(0 0 0 / 10%);
-  --rosewood-ring: oklch(0.488 0.217 264);
+  --rosewood-ring: oklch(0.42 0.135 18);
   color: var(--rosewood-foreground);
   font-family: var(--rosewood-font-sans);
 }
