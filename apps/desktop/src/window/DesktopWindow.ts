@@ -9,7 +9,11 @@ import * as Semaphore from "effect/Semaphore";
 
 import * as Electron from "electron";
 
-import { type DesktopSnapShotEvent, DEFAULT_CLIENT_SETTINGS } from "@rosewood/contracts";
+import {
+  type DesktopSnapShotEvent,
+  type DesktopWindowChrome,
+  DEFAULT_CLIENT_SETTINGS,
+} from "@rosewood/contracts";
 
 import * as DesktopAssets from "../app/DesktopAssets.ts";
 import * as DesktopEnvironment from "../app/DesktopEnvironment.ts";
@@ -232,10 +236,15 @@ function concealPendingQuitWindow(
   window.setOpacity(0);
 }
 
-function getWindowTitleBarOptions(
+export function getWindowTitleBarOptions(
   shouldUseDarkColors: boolean,
   platform: NodeJS.Platform,
+  windowChrome: DesktopWindowChrome,
 ): WindowTitleBarOptions {
+  if (windowChrome === "compositor") {
+    return { titleBarStyle: "hidden" };
+  }
+
   if (platform === "darwin") {
     return {
       titleBarStyle: "hiddenInset",
@@ -256,10 +265,18 @@ function getWindowTitleBarOptions(
   };
 }
 
+// A tile can be narrower than any minimum, and the compositor clips the overflow instead of resizing.
+export function getMainWindowMinimumSize(
+  windowChrome: DesktopWindowChrome,
+): Pick<Electron.BrowserWindowConstructorOptions, "minWidth" | "minHeight"> {
+  return windowChrome === "compositor" ? {} : { minWidth: 840, minHeight: 620 };
+}
+
 function syncWindowAppearance(
   window: Electron.BrowserWindow,
   shouldUseDarkColors: boolean,
   platform: NodeJS.Platform,
+  windowChrome: DesktopWindowChrome,
 ): Effect.Effect<void> {
   return Effect.sync(() => {
     if (window.isDestroyed()) {
@@ -267,7 +284,11 @@ function syncWindowAppearance(
     }
 
     window.setBackgroundColor(getInitialWindowBackgroundColor(shouldUseDarkColors));
-    const { titleBarOverlay } = getWindowTitleBarOptions(shouldUseDarkColors, platform);
+    const { titleBarOverlay } = getWindowTitleBarOptions(
+      shouldUseDarkColors,
+      platform,
+      windowChrome,
+    );
     if (typeof titleBarOverlay === "object") {
       window.setTitleBarOverlay(titleBarOverlay);
     }
@@ -389,15 +410,18 @@ export const make = Effect.gen(function* () {
     if (yield* Ref.get(desktopState.quitting)) return Option.none();
     const window = yield* electronWindow.create({
       ...initialBounds,
-      minWidth: 840,
-      minHeight: 620,
+      ...getMainWindowMinimumSize(environment.windowChrome),
       show: false,
       autoHideMenuBar: true,
       ...(environment.platform === "darwin" ? { disableAutoHideCursor: true } : {}),
       backgroundColor: getInitialWindowBackgroundColor(shouldUseDarkColors),
       ...iconOption,
       title: environment.displayName,
-      ...getWindowTitleBarOptions(shouldUseDarkColors, environment.platform),
+      ...getWindowTitleBarOptions(
+        shouldUseDarkColors,
+        environment.platform,
+        environment.windowChrome,
+      ),
       webPreferences: {
         preload: environment.preloadPath,
         // Hidden-renderer throttling stalls first paint; re-enable it after the first reveal.
@@ -1066,7 +1090,12 @@ export const make = Effect.gen(function* () {
     syncAppearance: Effect.gen(function* () {
       const shouldUseDarkColors = yield* electronTheme.shouldUseDarkColors;
       yield* electronWindow.syncAllAppearance((window) =>
-        syncWindowAppearance(window, shouldUseDarkColors, environment.platform),
+        syncWindowAppearance(
+          window,
+          shouldUseDarkColors,
+          environment.platform,
+          environment.windowChrome,
+        ),
       );
     }).pipe(Effect.withSpan("desktop.window.syncAppearance")),
   });

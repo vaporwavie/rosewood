@@ -4,6 +4,7 @@ import {
   DesktopEnvironmentBootstrapSchema,
   DesktopMediaReadSchema,
   DesktopThemeSchema,
+  DesktopWindowChromeSchema,
   EDITORS,
   EditorId,
   PickedThemeFileSchema,
@@ -71,6 +72,15 @@ export const getAppBranding = DesktopIpc.makeSyncIpcMethod({
   handler: Effect.fn("desktop.ipc.window.getAppBranding")(function* () {
     const environment = yield* DesktopEnvironment.DesktopEnvironment;
     return environment.branding;
+  }),
+});
+
+export const getWindowChrome = DesktopIpc.makeSyncIpcMethod({
+  channel: IpcChannels.GET_WINDOW_CHROME_CHANNEL,
+  result: DesktopWindowChromeSchema,
+  handler: Effect.fn("desktop.ipc.window.getWindowChrome")(function* () {
+    const environment = yield* DesktopEnvironment.DesktopEnvironment;
+    return environment.windowChrome;
   }),
 });
 

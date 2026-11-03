@@ -80,6 +80,10 @@ contextBridge.exposeInMainWorld("desktopBridge", {
     }
     return result as ReturnType<DesktopBridge["getAppBranding"]>;
   },
+  getWindowChrome: () =>
+    ipcRenderer.sendSync(IpcChannels.GET_WINDOW_CHROME_CHANNEL) === "compositor"
+      ? "compositor"
+      : "app",
   getRelayTelemetryEnabled: () =>
     ipcRenderer.sendSync(IpcChannels.GET_RELAY_TELEMETRY_ENABLED_CHANNEL) === true,
   getPathForFile: (file: File) => webUtils.getPathForFile(file),

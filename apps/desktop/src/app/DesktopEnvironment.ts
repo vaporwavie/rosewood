@@ -3,6 +3,7 @@ import type {
   DesktopAppStageLabel,
   DesktopRuntimeArch,
   DesktopRuntimeInfo,
+  DesktopWindowChrome,
 } from "@rosewood/contracts";
 import * as Config from "effect/Config";
 import * as Context from "effect/Context";
@@ -13,7 +14,7 @@ import * as Path from "effect/Path";
 
 import * as DesktopAppSettings from "../settings/DesktopAppSettings.ts";
 import * as DesktopConfig from "./DesktopConfig.ts";
-import { resolveLinuxDesktopEntryName } from "./DesktopEarlyElectronStartup.ts";
+import { isHyprlandSession, resolveLinuxDesktopEntryName } from "./DesktopEarlyElectronStartup.ts";
 import { resolveDesktopBaseDir, resolveDesktopStateDir } from "./DesktopStatePaths.ts";
 import { isNightlyDesktopVersion } from "../updates/updateChannels.ts";
 import type { OtlpProtocol } from "@rosewood/shared/observability";
@@ -73,6 +74,7 @@ export class DesktopEnvironment extends Context.Service<
     readonly otlpProtocol: OtlpProtocol;
     readonly branding: DesktopAppBranding;
     readonly displayName: string;
+    readonly windowChrome: DesktopWindowChrome;
     readonly appUserModelId: string;
     readonly linuxDesktopEntryName: string;
     readonly linuxApplicationsDir: string;
@@ -172,6 +174,14 @@ const make = Effect.fn("desktop.environment.make")(function* (
     appVersion: input.appVersion,
   });
   const displayName = branding.displayName;
+  const windowChrome: DesktopWindowChrome =
+    input.platform === "linux" &&
+    isHyprlandSession({
+      XDG_CURRENT_DESKTOP: Option.getOrUndefined(config.xdgCurrentDesktop),
+      XDG_SESSION_DESKTOP: Option.getOrUndefined(config.xdgSessionDesktop),
+    })
+      ? "compositor"
+      : "app";
   const stateDir = resolveDesktopStateDir({
     baseDir,
     isDevelopment,
@@ -227,6 +237,7 @@ const make = Effect.fn("desktop.environment.make")(function* (
     otlpProtocol: config.otlpProtocol,
     branding,
     displayName,
+    windowChrome,
     appUserModelId: Option.getOrElse(config.appUserModelIdOverride, () =>
       isDevelopment ? "io.github.vaporwavie.rosewood.dev" : "io.github.vaporwavie.rosewood",
     ),

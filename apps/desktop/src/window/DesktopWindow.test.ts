@@ -462,6 +462,20 @@ const captureOne = DesktopSnapShotId.make("11111111-1111-4111-8111-111111111111"
 const captureTwo = DesktopSnapShotId.make("22222222-2222-4222-8222-222222222222");
 
 describe("DesktopWindow", () => {
+  it("leaves window controls and sizing to the compositor only when it owns the chrome", () => {
+    assert.deepEqual(DesktopWindow.getWindowTitleBarOptions(true, "linux", "compositor"), {
+      titleBarStyle: "hidden",
+    });
+    assert.deepEqual(DesktopWindow.getMainWindowMinimumSize("compositor"), {});
+
+    const { titleBarOverlay } = DesktopWindow.getWindowTitleBarOptions(true, "linux", "app");
+    assert.equal(typeof titleBarOverlay, "object");
+    assert.deepEqual(DesktopWindow.getMainWindowMinimumSize("app"), {
+      minWidth: 840,
+      minHeight: 620,
+    });
+  });
+
   it("restores bounds only when the window fits within a connected display", () => {
     const persistedBounds = { x: 2040, y: 80, width: 1320, height: 880 };
     const displays = [

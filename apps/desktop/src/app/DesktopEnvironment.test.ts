@@ -38,6 +38,21 @@ const makeEnvironment = (
 ) => DesktopEnvironment.DesktopEnvironment.pipe(Effect.provide(layerEnvironment(overrides, env)));
 
 describe("DesktopEnvironment", () => {
+  it.effect.each([
+    { platform: "linux", desktop: "Hyprland", windowChrome: "compositor" },
+    { platform: "linux", desktop: "Hyprland:KDE", windowChrome: "compositor" },
+    { platform: "linux", desktop: "KDE", windowChrome: "app" },
+    { platform: "linux", desktop: undefined, windowChrome: "app" },
+    { platform: "darwin", desktop: "Hyprland", windowChrome: "app" },
+  ] as const)(
+    "resolves $windowChrome window chrome for $desktop on $platform",
+    ({ platform, desktop, windowChrome }) =>
+      Effect.gen(function* () {
+        const environment = yield* makeEnvironment({ platform }, { XDG_CURRENT_DESKTOP: desktop });
+        assert.equal(environment.windowChrome, windowChrome);
+      }),
+  );
+
   it.effect("uses the packaged Windows server sidecar as the backend root", () =>
     Effect.gen(function* () {
       const environment = yield* makeEnvironment({

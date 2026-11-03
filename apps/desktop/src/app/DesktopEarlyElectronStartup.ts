@@ -88,7 +88,7 @@ const featureListNames = (value: string | null): ReadonlyArray<string> =>
   (value ?? "").split(",").flatMap((entry) => entry.trim().match(/^\*?([^<:]+)/)?.[1] ?? []);
 
 // HYPRLAND_INSTANCE_SIGNATURE can be stale; trust only the session's desktop names.
-const isHyprlandSession = (env: NodeJS.ProcessEnv): boolean =>
+export const isHyprlandSession = (env: NodeJS.ProcessEnv): boolean =>
   (trimNonEmpty(env.XDG_CURRENT_DESKTOP) ?? trimNonEmpty(env.XDG_SESSION_DESKTOP) ?? "")
     .split(":")
     .some((name) => name.trim().toLowerCase() === "hyprland");

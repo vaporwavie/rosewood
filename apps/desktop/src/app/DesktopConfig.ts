@@ -37,6 +37,8 @@ export const DesktopConfig = Config.all({
   appDataDirectory: trimmedString("APPDATA"),
   xdgConfigHome: trimmedString("XDG_CONFIG_HOME"),
   xdgDataHome: trimmedString("XDG_DATA_HOME"),
+  xdgCurrentDesktop: trimmedString("XDG_CURRENT_DESKTOP"),
+  xdgSessionDesktop: trimmedString("XDG_SESSION_DESKTOP"),
   rosewoodHome: trimmedString("ROSEWOOD_HOME"),
   devServerUrl: Config.URL("VITE_DEV_SERVER_URL").pipe(Config.option),
   appUserModelIdOverride: trimmedString("ROSEWOOD_DESKTOP_APP_USER_MODEL_ID"),
