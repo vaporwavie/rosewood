@@ -21,7 +21,6 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          filter: blob:none
 
       - uses: ./.github/actions/setup-ci-deps
         with:
