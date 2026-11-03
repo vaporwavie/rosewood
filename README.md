@@ -15,7 +15,7 @@ State lives in `~/.rosewood`, separate from any T3 Code install. Telemetry is of
 
 ## Desktop build
 
-The Linux desktop build needs libsecret headers (`libsecret-devel` on Fedora, `libsecret-1-dev` on Debian).
+The Linux desktop build needs libsecret headers (`libsecret-devel` on Fedora, `libsecret-1-dev` on Debian). On Fedora it also needs `libxcrypt-compat`, because the `.deb` step's bundled `fpm` loads `libcrypt.so.1`.
 
 ```bash
 vp run dist:desktop:linux
