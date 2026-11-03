@@ -384,6 +384,11 @@ export const PALETTE_PATCHES = [
     /backgroundColor: "#0a0a0a"/g,
     `backgroundColor: "${DARK.canvas}"`,
   ),
+  required(
+    "apps/mobile/app.config.ts",
+    /androidAdaptiveBackgroundImage: undefined/g,
+    'androidAdaptiveBackgroundImage: "./assets/android-icon-background-prod.png"',
+  ),
   // Fixtures that pin the old surfaces. A miss only fails that test.
   fixture(
     "apps/web/src/themePalette.test.ts",

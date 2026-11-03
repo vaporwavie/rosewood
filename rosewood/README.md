@@ -30,7 +30,7 @@ Edit the rules in `rebrand.mjs`, then run `rosewood/sync.sh --merge`. The script
 
 ## Icons
 
-`rosewood/generate-icons.sh` draws the placeholder desktop and web icons into `overlay/`. Edit its colors or mark, rerun it, then sync. The mark used in the UI is `NEW_MARK_PATH` in `rebrand.mjs`. Mobile launcher PNGs in `apps/mobile/assets` still show the old mark.
+`rosewood/generate-icons.sh` draws the one icon, a grained rose tile, into `overlay/` for every channel and surface. Edit its colors, rerun it, then sync. The UI mark is `NEW_MARK_PATH` in `rebrand.mjs`, a one-color cut of the same tile, and the script repeats it as `GLYPH`.
 
 ## Palette
 
