@@ -1,10 +1,10 @@
-import { EnvironmentId } from "@t3tools/contracts";
-import { mediaMimeType } from "@t3tools/shared/mediaPreview";
+import { EnvironmentId } from "@rosewood/contracts";
+import { mediaMimeType } from "@rosewood/shared/mediaPreview";
 import {
   getProjectFaviconCacheKey,
   getProjectFaviconResourceKey,
   isProjectFaviconFallbackUrl,
-} from "@t3tools/shared/projectFavicon";
+} from "@rosewood/shared/projectFavicon";
 import * as Base64 from "effect/encoding/Base64";
 import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";

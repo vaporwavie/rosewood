@@ -1,7 +1,11 @@
-import type { EnvironmentConnectionPhase } from "@t3tools/client-runtime/connection";
-import { availableScratchWorkspaceRoot } from "@t3tools/client-runtime/operations/projects";
-import type { EnvironmentProject } from "@t3tools/client-runtime/state/shell";
-import { repositoryGroupingKeyOf, type EnvironmentId, type ServerConfig } from "@t3tools/contracts";
+import type { EnvironmentConnectionPhase } from "@rosewood/client-runtime/connection";
+import { availableScratchWorkspaceRoot } from "@rosewood/client-runtime/operations/projects";
+import type { EnvironmentProject } from "@rosewood/client-runtime/state/shell";
+import {
+  repositoryGroupingKeyOf,
+  type EnvironmentId,
+  type ServerConfig,
+} from "@rosewood/contracts";
 
 import { scopedProjectKey } from "../../lib/scopedEntities";
 import type { HomeProjectScope } from "../home/homeThreadList";

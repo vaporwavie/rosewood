@@ -2,13 +2,13 @@ import * as NodeChildProcess from "node:child_process";
 import * as NodeFSP from "node:fs/promises";
 import * as NodePath from "node:path";
 
-// The caller supplies the harness's T3 preview tool dispatcher, not Playwright.
+// The caller supplies the harness's Rosewood preview tool dispatcher, not Playwright.
 export async function createDriver(
   callPreview,
   { tabId, outputDir, repoDir, run, phase, sourceTreeSha },
 ) {
   await NodeFSP.mkdir(outputDir, { recursive: true });
-  await NodeFSP.mkdir("/tmp/t3-terminal-evidence", { recursive: true });
+  await NodeFSP.mkdir("/tmp/rosewood-terminal-evidence", { recursive: true });
   const events = [];
   const captures = [];
   const started = Date.now();
@@ -29,7 +29,7 @@ export async function createDriver(
   // Watch before the action that starts a shell, so fast prompts cannot race the watcher.
   const arm = async () => {
     await milestones?.return();
-    milestones = NodeFSP.watch("/tmp/t3-terminal-evidence");
+    milestones = NodeFSP.watch("/tmp/rosewood-terminal-evidence");
     pendingMilestones = milestones.next();
   };
   const call = async (name, args = {}) => {
@@ -58,7 +58,7 @@ export async function createDriver(
     },
     columns: async () =>
       Number(
-        (await NodeFSP.readFile("/tmp/t3-terminal-evidence/input-size", "utf8"))
+        (await NodeFSP.readFile("/tmp/rosewood-terminal-evidence/input-size", "utf8"))
           .trim()
           .split(/\s+/)[1],
       ),

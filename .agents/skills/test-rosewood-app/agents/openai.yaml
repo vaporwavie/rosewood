@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rosewood App Testing"
+  short_description: "Test web and desktop in Rosewood's Browser panel"
+  default_prompt: "Use $test-rosewood-app to verify the affected web or desktop flow through Rosewood's Browser panel."

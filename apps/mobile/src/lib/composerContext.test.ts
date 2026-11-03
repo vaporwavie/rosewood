@@ -2,14 +2,14 @@ import {
   ComposerContextId,
   type OrchestrationMessageContext,
   type ServerProviderSkill,
-} from "@t3tools/contracts";
-import { collectComposerInlineTokens } from "@t3tools/shared/composerInlineTokens";
+} from "@rosewood/contracts";
+import { collectComposerInlineTokens } from "@rosewood/shared/composerInlineTokens";
 import {
   ATTACHMENT_ONLY_BOOTSTRAP_PROMPT,
   collectComposerContextReferences,
   formatComposerContextReference,
   projectComposerContextForProvider,
-} from "@t3tools/shared/composerContextReferences";
+} from "@rosewood/shared/composerContextReferences";
 import { describe, expect, it } from "vite-plus/test";
 import {
   composerContextEditorTokens,

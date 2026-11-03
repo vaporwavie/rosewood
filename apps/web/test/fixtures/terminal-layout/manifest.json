@@ -34,5 +34,5 @@
     "before": "0a12a6535c2d56325ef3193068b44c5ef08eb4b2",
     "after": "9626c2640b7d20fc38c972ed6fd3af250a434c16"
   },
-  "setup": "Pair an isolated dev server; createDriver dispatches T3 preview tools for one owned tab; setup creates a fresh draft and shell. Call replay with the returned threadRef/threadKey. Use typeFirstLine for pending-input captures. Stop the server before seed.mjs."
+  "setup": "Pair an isolated dev server; createDriver dispatches Rosewood preview tools for one owned tab; setup creates a fresh draft and shell. Call replay with the returned threadRef/threadKey. Use typeFirstLine for pending-input captures. Stop the server before seed.mjs."
 }

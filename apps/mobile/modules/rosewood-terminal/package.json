@@ -1,0 +1,17 @@
+{
+  "name": "@rosewood/mobile-terminal-native",
+  "version": "0.0.0",
+  "private": true,
+  "expo-module": {
+    "ios": {
+      "modules": [
+        "RosewoodTerminalModule"
+      ]
+    },
+    "android": {
+      "modules": [
+        "expo.modules.rosewoodterminal.RosewoodTerminalModule"
+      ]
+    }
+  }
+}

@@ -2,12 +2,12 @@ import type {
   AtomCommand,
   AtomCommandOptions,
   AtomCommandResult,
-} from "@t3tools/client-runtime/state/runtime";
+} from "@rosewood/client-runtime/state/runtime";
 import {
   AuthOrchestrationOperateScope,
   EnvironmentAuthorizationError,
   type EnvironmentId,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import * as Cause from "effect/Cause";
 import { AsyncResult } from "effect/reactivity";
 

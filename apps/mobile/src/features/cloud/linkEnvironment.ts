@@ -9,14 +9,14 @@ import {
   EnvironmentHttpForbiddenError,
   EnvironmentHttpInternalServerError,
   EnvironmentHttpUnauthorizedError,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import {
   type RelayEnvironmentLinkResponse as RelayEnvironmentLinkResponseType,
   type RelayManagedEndpointProviderKind,
-} from "@t3tools/contracts/relay";
-import { findErrorTraceId } from "@t3tools/client-runtime/errors";
-import { ManagedRelay, relayRequestFailureDetail } from "@t3tools/client-runtime/relay";
-import { makeEnvironmentHttpApiClient } from "@t3tools/client-runtime/rpc";
+} from "@rosewood/contracts/relay";
+import { findErrorTraceId } from "@rosewood/client-runtime/errors";
+import { ManagedRelay, relayRequestFailureDetail } from "@rosewood/client-runtime/relay";
+import { makeEnvironmentHttpApiClient } from "@rosewood/client-runtime/rpc";
 
 import type { SavedRemoteConnection } from "../../lib/connection";
 import * as MobileStorage from "../../persistence/mobile-storage";

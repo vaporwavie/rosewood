@@ -9,7 +9,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { ne } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
-import { DEFAULT_MANAGED_TUNNEL_LIMIT, type RelayT3ChatPlan } from "@t3tools/contracts/relay";
+import { DEFAULT_MANAGED_TUNNEL_LIMIT, type RelayT3ChatPlan } from "@rosewood/contracts/relay";
 
 import * as RelayDb from "../db.ts";
 import { relayManagedEndpointAllocations } from "../persistence/schema.ts";
@@ -19,7 +19,7 @@ import * as ManagedTunnelLimits from "./ManagedTunnelLimits.ts";
 const BACKFILL_MIGRATION = "20261028062605_backfill_withdrawn_tunnel_allocations";
 
 class FakeTransaction extends Context.Service<FakeTransaction, { holdsLock: boolean }>()(
-  "t3code-relay/environments/ManagedTunnelLimits.test/FakeTransaction",
+  "rosewood-relay/environments/ManagedTunnelLimits.test/FakeTransaction",
 ) {}
 
 interface FakeDbInput {
@@ -81,7 +81,7 @@ function makeFakeDb(input: FakeDbInput) {
   } as unknown as RelayDb.RelayDb["Service"];
 }
 
-const t3ChatLayer = (plan: RelayT3ChatPlan | "lookup-fails", lookups?: Array<string>) =>
+const rosewoodChatLayer = (plan: RelayT3ChatPlan | "lookup-fails", lookups?: Array<string>) =>
   Layer.mock(T3ChatAccounts.T3ChatAccounts, {
     available: true,
     getLink: ({ userId }) => {
@@ -116,7 +116,7 @@ const reserve = (
             makeFakeDb({ ...input, otherSlots: () => input.activeTunnels }),
           ),
         ),
-        Layer.provide(t3ChatLayer(input.plan, input.lookups)),
+        Layer.provide(rosewoodChatLayer(input.plan, input.lookups)),
       ),
     ),
   );
@@ -137,7 +137,7 @@ const getOverride = (override?: number) =>
             }),
           ),
         ),
-        Layer.provide(t3ChatLayer("free")),
+        Layer.provide(rosewoodChatLayer("free")),
       ),
     ),
   );
@@ -174,7 +174,7 @@ describe("ManagedTunnelLimits", () => {
           Layer.provide(
             Layer.succeed(RelayDb.RelayDb, makeFakeDb({ otherSlots: () => reserved.length })),
           ),
-          Layer.provide(t3ChatLayer("free")),
+          Layer.provide(rosewoodChatLayer("free")),
         ),
       ),
     );

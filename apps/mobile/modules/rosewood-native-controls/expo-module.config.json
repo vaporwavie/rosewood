@@ -1,0 +1,19 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["RosewoodNativeControlsModule", "RosewoodKeyboardCommandsModule"],
+    "appDelegateSubscribers": [
+      "RosewoodWorkspaceOrientationSubscriber",
+      "RosewoodMenuDismissTouchGateSubscriber",
+      "RosewoodBackgroundGraceSubscriber"
+    ]
+  },
+  "android": {
+    "modules": [
+      "expo.modules.rosewoodnativecontrols.RosewoodNativeControlsModule",
+      "expo.modules.rosewoodnativecontrols.RosewoodWorkspaceNavigationModule",
+      "expo.modules.rosewoodnativecontrols.RosewoodKeyboardCommandsModule",
+      "expo.modules.rosewoodnativecontrols.RosewoodFoldPostureModule"
+    ]
+  }
+}

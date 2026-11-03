@@ -1,46 +1,50 @@
-import type { EnvironmentServerConfig } from "@t3tools/client-runtime/connection";
-import { scopeThreadRef, scopedThreadKey } from "@t3tools/client-runtime/environment";
-import { resolveThreadWorkingStartedAt } from "@t3tools/client-runtime/state/models";
-import { isShownUnderParent } from "@t3tools/client-runtime/state/threads";
-import { backgroundWorkHoldsCompletion } from "@t3tools/shared/orchestrationV2PendingBackgroundWork";
-import { threadPullRequestSearchTerms } from "@t3tools/shared/threadPullRequests";
+import type { EnvironmentServerConfig } from "@rosewood/client-runtime/connection";
+import { scopeThreadRef, scopedThreadKey } from "@rosewood/client-runtime/environment";
+import { resolveThreadWorkingStartedAt } from "@rosewood/client-runtime/state/models";
+import { isShownUnderParent } from "@rosewood/client-runtime/state/threads";
+import { backgroundWorkHoldsCompletion } from "@rosewood/shared/orchestrationV2PendingBackgroundWork";
+import { threadPullRequestSearchTerms } from "@rosewood/shared/threadPullRequests";
 import * as React from "react";
 import {
   isAtomCommandInterrupted,
   type AtomCommandResult,
-} from "@t3tools/client-runtime/state/runtime";
+} from "@rosewood/client-runtime/state/runtime";
 import { defaultAnimateLayoutChanges, type AnimateLayoutChanges } from "@dnd-kit/sortable";
 import {
   threadSearchMatchKey,
   threadSearchSubject,
   type ThreadSearchShell,
-} from "@t3tools/client-runtime/state/thread-search";
-import { foldSearchQuery, rankSearchItems, scoreThreadSearch } from "@t3tools/shared/paletteSearch";
-import type { EnvironmentConnectionPhase } from "@t3tools/client-runtime/connection";
+} from "@rosewood/client-runtime/state/thread-search";
+import {
+  foldSearchQuery,
+  rankSearchItems,
+  scoreThreadSearch,
+} from "@rosewood/shared/paletteSearch";
+import type { EnvironmentConnectionPhase } from "@rosewood/client-runtime/connection";
 import {
   isListedThreadLineage,
   type ContextMenuItem,
   type EnvironmentId,
   type ThreadId,
-} from "@t3tools/contracts";
-import type { SidebarProjectSortOrder, SidebarThreadSortOrder } from "@t3tools/contracts/settings";
+} from "@rosewood/contracts";
+import type { SidebarProjectSortOrder, SidebarThreadSortOrder } from "@rosewood/contracts/settings";
 import type { AsyncResult } from "effect/reactivity";
 import {
   effectiveSnoozed,
   type ThreadSnoozeShell,
-} from "@t3tools/client-runtime/state/thread-settled";
+} from "@rosewood/client-runtime/state/thread-settled";
 import {
   getThreadSortTimestamp,
   planPinnedReorder,
   sortThreads,
   toSortableTimestamp,
   type ThreadSortInput,
-} from "@t3tools/client-runtime/state/thread-sort";
+} from "@rosewood/client-runtime/state/thread-sort";
 import type { SidebarThreadSummary, Thread } from "../types";
 import { normalizeSearchText } from "../lib/utils";
 import { isLatestRunSettled } from "../session-logic";
 import { observeIntersection } from "../lib/observeIntersection";
-import { deadlineAfter, deadlineStore } from "@t3tools/client-runtime/clock";
+import { deadlineAfter, deadlineStore } from "@rosewood/client-runtime/clock";
 import { useDeadlinePassed } from "../hooks/useDeadline";
 import { legacyProjectCwdPreferenceKey } from "../uiStateStore";
 
@@ -1006,14 +1010,14 @@ export function firstValidTimestampMs(
   return 0;
 }
 
-export { sortActiveThreadsByOrderKey as sortThreadsForSidebar } from "@t3tools/client-runtime/state/thread-sort";
+export { sortActiveThreadsByOrderKey as sortThreadsForSidebar } from "@rosewood/client-runtime/state/thread-sort";
 export {
   sortInboxThreadsByReturn,
   sortWorkingThreadsBySend,
-} from "@t3tools/client-runtime/state/thread-inbox";
+} from "@rosewood/client-runtime/state/thread-inbox";
 
-export { pinOrderKeyBetween } from "@t3tools/client-runtime/state/thread-sort";
-export { sortPinnedThreadsByOrderKey as sortPinnedThreadsForSidebar } from "@t3tools/client-runtime/state/thread-sort";
+export { pinOrderKeyBetween } from "@rosewood/client-runtime/state/thread-sort";
+export { sortPinnedThreadsByOrderKey as sortPinnedThreadsForSidebar } from "@rosewood/client-runtime/state/thread-sort";
 
 const EMPTY_CONTENT_MATCH_KEYS: ReadonlySet<string> = new Set<string>();
 

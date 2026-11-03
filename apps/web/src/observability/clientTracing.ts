@@ -5,10 +5,13 @@ import * as Scope from "effect/Scope";
 import { HttpClient } from "effect/http";
 import { OtlpExporter, OtlpSerialization, OtlpTracer } from "effect/observability";
 
-import { settleAsyncResult, squashAtomCommandFailure } from "@t3tools/client-runtime/state/runtime";
-import { safeErrorLogAttributes } from "@t3tools/client-runtime/errors";
+import {
+  settleAsyncResult,
+  squashAtomCommandFailure,
+} from "@rosewood/client-runtime/state/runtime";
+import { safeErrorLogAttributes } from "@rosewood/client-runtime/errors";
 import { resolvePrimaryEnvironmentHttpUrl } from "../environments/primary";
-import { releaseChannelOf, releaseResourceAttributes } from "@t3tools/shared/releaseResource";
+import { releaseChannelOf, releaseResourceAttributes } from "@rosewood/shared/releaseResource";
 import * as ClientTracer from "./clientTracer";
 import * as PrimaryEnvironmentHttpLayer from "../environments/primary/httpLayer";
 import { isElectron } from "../env";
@@ -49,13 +52,13 @@ const RELEASE_CHANNEL =
       ? "preview"
       : releaseChannelOf(APP_VERSION);
 const CLIENT_TRACING_RESOURCE = {
-  serviceName: "t3code-web",
+  serviceName: "rosewood-web",
   attributes: {
-    "service.namespace": "t3code",
+    "service.namespace": "rosewood",
     "service.instance.id": ClientTracer.serviceInstanceId,
     ...releaseResourceAttributes(RELEASE_CHANNEL),
-    "service.runtime": "t3-web",
-    "t3code.client.surface": isElectron ? "desktop" : "web",
+    "service.runtime": "rosewood-web",
+    "rosewood.client.surface": isElectron ? "desktop" : "web",
     "service.version": APP_VERSION,
     ...browserResourceAttributes(),
   },

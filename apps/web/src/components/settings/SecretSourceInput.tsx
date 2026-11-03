@@ -4,8 +4,8 @@ import {
   type SecretProviderConfig,
   type SecretProviderId,
   type SecretProviderKind,
-} from "@t3tools/contracts";
-import { builtInSecretProviderDefinitions } from "@t3tools/secret-provider-definitions/registry";
+} from "@rosewood/contracts";
+import { builtInSecretProviderDefinitions } from "@rosewood/secret-provider-definitions/registry";
 import { useAtomValue } from "@effect/atom-react";
 import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";

@@ -3,7 +3,7 @@ import {
   applyTerminalAttachStreamEvent,
   INITIAL_TERMINAL_OUTPUT_CURSOR,
   nextTerminalAttachSeedState,
-} from "@t3tools/client-runtime/state/terminal";
+} from "@rosewood/client-runtime/state/terminal";
 import { synchronizeTerminalSession } from "../../components/ThreadTerminalDrawer";
 
 import { GhosttyTerminalCore, type GhosttyCell, type GhosttyRow } from "./core";
@@ -732,9 +732,9 @@ describe("terminalLinkAtPositionWithRange", () => {
       cells: [
         { ...cell("🙂"), wide: 1 },
         { ...cell(""), wide: 2 },
-        ...Array.from("https://t3.code", (character) => cell(character)),
+        ...Array.from("https://rosewood.code", (character) => cell(character)),
       ],
-      text: "🙂 https://t3.code",
+      text: "🙂 https://rosewood.code",
       isWrapContinuation: false,
       wrapsToNext: true,
     };

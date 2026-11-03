@@ -9,10 +9,10 @@ interface ObserverProps extends ViewProps {
 function resolveObserver() {
   try {
     const module = requireOptionalNativeModule<{
-      readonly ViewPrototypes?: { readonly T3NativeControls_LayoutMetrics?: unknown };
-    }>("T3NativeControls");
-    if (!module?.ViewPrototypes?.T3NativeControls_LayoutMetrics) return null;
-    return requireNativeView<ObserverProps>("T3NativeControls", "LayoutMetrics");
+      readonly ViewPrototypes?: { readonly RosewoodNativeControls_LayoutMetrics?: unknown };
+    }>("RosewoodNativeControls");
+    if (!module?.ViewPrototypes?.RosewoodNativeControls_LayoutMetrics) return null;
+    return requireNativeView<ObserverProps>("RosewoodNativeControls", "LayoutMetrics");
   } catch {
     return null;
   }

@@ -5,14 +5,14 @@ import {
   type EnvironmentId,
   type UsageSummary,
   type UsageSummaryInput,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import {
   needsCursorKeychainAccess,
   refreshUsage,
   usageSummaryInput,
-} from "@t3tools/client-runtime/state/usage";
-import { resolveUsageAccess } from "@t3tools/client-runtime/state/usage-access";
-import { mergeUsage, type EnvironmentUsage, type MergedUsage } from "@t3tools/shared/usageMerge";
+} from "@rosewood/client-runtime/state/usage";
+import { resolveUsageAccess } from "@rosewood/client-runtime/state/usage-access";
+import { mergeUsage, type EnvironmentUsage, type MergedUsage } from "@rosewood/shared/usageMerge";
 import { AsyncResult, Atom } from "effect/reactivity";
 import { useCallback, useMemo } from "react";
 

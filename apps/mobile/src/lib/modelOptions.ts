@@ -2,26 +2,26 @@ import {
   normalizeProviderAccentColor,
   resolveProviderInstanceDisplayName,
   shouldShowInstanceBadge,
-} from "@t3tools/client-runtime/state/provider-instance-display";
+} from "@rosewood/client-runtime/state/provider-instance-display";
 
 import type {
   ModelCapabilities,
   ModelSelection,
   ProjectId,
   RuntimeMode,
-  ServerConfig as T3ServerConfig,
-} from "@t3tools/contracts";
+  ServerConfig as RosewoodServerConfig,
+} from "@rosewood/contracts";
 import {
   disallowedProviderMessage,
   isManagedDriverAllowed,
   isProviderDriverKind,
   resolveProjectProviderInstanceEnabled,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import {
   buildExplicitProviderOptionSelectionsFromDescriptors,
   getProviderOptionDescriptors,
-} from "@t3tools/shared/model";
-import { resolveModelShortName } from "@t3tools/client-runtime/provider-clients";
+} from "@rosewood/shared/model";
+import { resolveModelShortName } from "@rosewood/client-runtime/provider-clients";
 
 export type ModelOption = {
   readonly key: string;
@@ -49,7 +49,7 @@ export type ModelOption = {
 };
 
 type ProviderUpdateRequired = Pick<
-  T3ServerConfig["providers"][number],
+  RosewoodServerConfig["providers"][number],
   "driver" | "updateRequiredModels"
 >;
 
@@ -73,7 +73,7 @@ function providerDisplayLabel(provider: {
 }
 
 function isProviderEnabledForProject(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   provider:
     | { readonly instanceId: ModelSelection["instanceId"]; readonly enabled: boolean }
     | undefined,
@@ -88,7 +88,7 @@ function isProviderEnabledForProject(
 }
 
 function isProjectDisabledOverride(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   instanceId: ModelSelection["instanceId"],
   projectId: ProjectId | null,
 ): boolean {
@@ -102,7 +102,7 @@ function isProjectDisabledOverride(
 }
 
 function isDisabledForProject(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   provider:
     | { readonly instanceId: ModelSelection["instanceId"]; readonly enabled: boolean }
     | undefined,
@@ -116,7 +116,7 @@ function isDisabledForProject(
 }
 
 function selectionDriver(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   instanceId: ModelSelection["instanceId"],
 ): string | undefined {
   return (
@@ -126,7 +126,10 @@ function selectionDriver(
 }
 
 /** Whether the environment's managed policy leaves this driver out; the server refuses its turns. */
-function isDriverDisallowed(config: T3ServerConfig | null | undefined, driver: string | undefined) {
+function isDriverDisallowed(
+  config: RosewoodServerConfig | null | undefined,
+  driver: string | undefined,
+) {
   return (
     driver !== undefined &&
     isProviderDriverKind(driver) &&
@@ -161,7 +164,7 @@ function normalizeSelectionOptions(
 
 /** Require explicit projectId or null so omissions cannot bypass project provider disablement. */
 export function isModelSelectionUnavailable(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   selection: ModelSelection | null | undefined,
   projectId: ProjectId | null,
 ): boolean {
@@ -190,7 +193,7 @@ export function isModelSelectionUnavailable(
 }
 
 export function describeUnavailableModelSelection(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   selection: ModelSelection,
   projectId: ProjectId | null,
 ): { readonly title: string; readonly detail: string } {
@@ -223,7 +226,7 @@ export function describeUnavailableModelSelection(
 }
 
 export function resolveSelectableModelSelection(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   selection: ModelSelection | null,
   projectId: ProjectId | null,
 ): ModelSelection | null {
@@ -247,7 +250,7 @@ export function resolveSelectableModelSelection(
 }
 
 export function resolveDefaultableModelSelection(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   selection: ModelSelection | null,
   projectId: ProjectId | null,
 ): ModelSelection | null {
@@ -277,7 +280,7 @@ export function resolveNewTaskModelSelection(input: {
 }
 
 export function buildModelOptions(
-  config: T3ServerConfig | null | undefined,
+  config: RosewoodServerConfig | null | undefined,
   fallbackModelSelection: ModelSelection | null,
   providerInstanceId: ModelSelection["instanceId"] | undefined,
   projectId: ProjectId | null,
@@ -287,7 +290,7 @@ export function buildModelOptions(
   const lockedProvider = config?.providers.find(
     (provider) => provider.instanceId === providerInstanceId,
   );
-  const matchesLockedProvider = (provider: T3ServerConfig["providers"][number]) => {
+  const matchesLockedProvider = (provider: RosewoodServerConfig["providers"][number]) => {
     if (providerInstanceId === undefined || provider.instanceId === providerInstanceId) return true;
     if (!lockedProvider || provider.driver !== lockedProvider.driver) return false;
     const groupKey = lockedProvider.continuation?.groupKey;

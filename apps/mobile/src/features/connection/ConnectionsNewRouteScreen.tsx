@@ -11,7 +11,7 @@ import {
   useRoute,
   type StaticScreenProps,
 } from "@react-navigation/native";
-import type { EnvironmentId } from "@t3tools/contracts";
+import type { EnvironmentId } from "@rosewood/contracts";
 import { useAtomValue } from "@effect/atom-react";
 import { useState } from "react";
 import { Linking, Pressable, StyleSheet, View } from "react-native";
@@ -215,7 +215,9 @@ function PairingForm({
           />
 
           <View collapsable={false} className="gap-2">
-            <Text className="px-4 text-sm font-t3-medium text-foreground-muted">Or enter it</Text>
+            <Text className="px-4 text-sm font-rosewood-medium text-foreground-muted">
+              Or enter it
+            </Text>
             <View
               collapsable={false}
               className={cn(
@@ -254,7 +256,7 @@ function PairingForm({
             </Text>
           </View>
 
-          {hasCloudPublicConfig() ? <T3ConnectSection /> : null}
+          {hasCloudPublicConfig() ? <RosewoodConnectSection /> : null}
         </View>
       </ScrollView>
     </SettingsScreen>
@@ -338,7 +340,10 @@ function PairingScanCard(props: {
                 weight="light"
               />
               <Text
-                className={cn("font-t3-medium text-sm", light ? "text-black/70" : "text-white/80")}
+                className={cn(
+                  "font-rosewood-medium text-sm",
+                  light ? "text-black/70" : "text-white/80",
+                )}
               >
                 Tap to scan
               </Text>
@@ -346,14 +351,14 @@ function PairingScanCard(props: {
           )}
         </View>
         <Text className={cn("text-center text-sm", light ? "text-black/70" : "text-white/80")}>
-          Scan the code from t3 pair or desktop Connections settings
+          Scan the code from rosewood pair or desktop Connections settings
         </Text>
       </View>
     </Pressable>
   );
 }
 
-function T3ConnectSection() {
+function RosewoodConnectSection() {
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const navigation = useNavigation();
   const { connectedEnvironments, onSetEnvironmentEnabled, onRemoveEnvironmentPress } =
@@ -365,7 +370,7 @@ function T3ConnectSection() {
 
   return (
     <View collapsable={false} className="gap-2">
-      <Text className="px-4 text-sm font-t3-medium text-foreground-muted">
+      <Text className="px-4 text-sm font-rosewood-medium text-foreground-muted">
         Or use the managed relay
       </Text>
       {isSignedIn ? (
@@ -377,7 +382,7 @@ function T3ConnectSection() {
         />
       ) : (
         <ListRow
-          label="Sign in to T3 Connect"
+          label="Sign in to Rosewood Connect"
           description="Reach your machines from anywhere, no network setup."
           disabled={!isLoaded}
           onPress={() => navigation.navigate("SettingsAuth")}

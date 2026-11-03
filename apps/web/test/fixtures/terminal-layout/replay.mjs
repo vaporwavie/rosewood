@@ -1,4 +1,4 @@
-// The driver invokes only T3 preview tools. Each checkpoint saves the whole viewport.
+// The driver invokes only Rosewood preview tools. Each checkpoint saves the whole viewport.
 export async function replay(driver, { mode, width, shellPath, threadRef, threadKey }) {
   const owner = mode === "RP" ? "right-panel" : "drawer";
   const surface = `[data-terminal-owner="${owner}"]`;
@@ -184,7 +184,7 @@ export async function replay(driver, { mode, width, shellPath, threadRef, thread
   await checkpoint("E-last-close");
   if (mode === "RP") {
     const open = await read(
-      `JSON.parse(localStorage.getItem('t3code:right-panel-state:v2')).state.byThreadKey[driverThreadKey]?.isOpen === true`,
+      `JSON.parse(localStorage.getItem('rosewood:right-panel-state:v2')).state.byThreadKey[driverThreadKey]?.isOpen === true`,
     );
     if (!open) await click('button[aria-label="Toggle right panel"]:visible');
     await click('role=button[name="Terminal T"]');

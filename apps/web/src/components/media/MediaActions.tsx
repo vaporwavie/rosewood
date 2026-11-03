@@ -1,13 +1,13 @@
 import {
   formatFilePathForClipboard,
   type MediaActionId,
-} from "@t3tools/client-runtime/media-actions";
+} from "@rosewood/client-runtime/media-actions";
 import {
   mediaReferenceFileName,
   type MediaReference,
-} from "@t3tools/client-runtime/media-reference";
-import { resolveAssetUrl } from "@t3tools/client-runtime/state/assets";
-import { settlePromise, squashAtomCommandFailure } from "@t3tools/client-runtime/state/runtime";
+} from "@rosewood/client-runtime/media-reference";
+import { resolveAssetUrl } from "@rosewood/client-runtime/state/assets";
+import { settlePromise, squashAtomCommandFailure } from "@rosewood/client-runtime/state/runtime";
 import {
   AuthFilesystemReadScope,
   type AssetResource,
@@ -15,7 +15,7 @@ import {
   type EnvironmentId,
   sessionGrantsScope,
   type SessionGrantInput,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { AsyncResult } from "effect/reactivity";
 import { useRef, useState, type ReactElement } from "react";
 

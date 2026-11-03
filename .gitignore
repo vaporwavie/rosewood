@@ -15,7 +15,7 @@ build/
 .logs/
 release/
 release-mock/
-.t3
+.rosewood
 .idea/
 apps/web/.playwright
 apps/web/playwright-report

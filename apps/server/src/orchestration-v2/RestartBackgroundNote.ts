@@ -5,8 +5,11 @@ import type {
   OrchestrationV2Run,
   OrchestrationV2RunAttempt,
   OrchestrationV2TurnItem,
-} from "@t3tools/contracts";
-import { latestRootProviderFailure, runRanAfter } from "@t3tools/shared/orchestrationV2ThreadError";
+} from "@rosewood/contracts";
+import {
+  latestRootProviderFailure,
+  runRanAfter,
+} from "@rosewood/shared/orchestrationV2ThreadError";
 
 type Work = OrchestrationV2RestartCancelledBackgroundWork;
 type Attempt = Pick<OrchestrationV2RunAttempt, "id" | "runId">;
@@ -122,7 +125,7 @@ const MAX_NOTE_ENTRIES = 10;
 export function restartCancelledBackgroundWorkNote(work: ReadonlyArray<Work>): string {
   const omitted = work.length - MAX_NOTE_ENTRIES;
   return [
-    "Note: the T3 server restarted, and this background work was cancelled before it finished. It will not report back on its own, so resume or restart what you still need and wait for its result:",
+    "Note: the Rosewood server restarted, and this background work was cancelled before it finished. It will not report back on its own, so resume or restart what you still need and wait for its result:",
     ...work.slice(0, MAX_NOTE_ENTRIES).map((entry) => `- ${entry.kind}: ${entry.label}`),
     ...(omitted > 0 ? [`- and ${omitted} more`] : []),
   ].join("\n");

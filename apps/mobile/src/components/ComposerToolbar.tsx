@@ -90,7 +90,9 @@ export function ComposerInlineControl(props: {
           >
             <Text
               className={cn(
-                props.size === "large" ? "text-base font-t3-medium" : "text-sm font-t3-medium",
+                props.size === "large"
+                  ? "text-base font-rosewood-medium"
+                  : "text-sm font-rosewood-medium",
                 props.emphasized || props.selected ? "text-foreground" : "text-foreground-muted",
               )}
               numberOfLines={1}
@@ -375,7 +377,7 @@ export function ComposerToolbarButton(props: {
       {props.label ? (
         <Text
           className={cn(
-            "shrink text-center text-sm font-t3-bold",
+            "shrink text-center text-sm font-rosewood-bold",
             variant === "primary"
               ? props.disabled
                 ? "text-foreground-muted"

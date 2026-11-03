@@ -1,9 +1,9 @@
-import { formatFilePathForClipboard } from "@t3tools/client-runtime/media-actions";
-import { fileBasename } from "@t3tools/shared/path";
-import type { ThreadId } from "@t3tools/contracts";
+import { formatFilePathForClipboard } from "@rosewood/client-runtime/media-actions";
+import { fileBasename } from "@rosewood/shared/path";
+import type { ThreadId } from "@rosewood/contracts";
 import { resolveMarkdownLinkPresentation } from "../../lib/markdownLinks";
 import type { MarkdownFileContextMenu } from "../../native/SelectableMarkdownText.types";
-import { hostPreviewMimeTypeFromExtension } from "@t3tools/shared/filePreview";
+import { hostPreviewMimeTypeFromExtension } from "@rosewood/shared/filePreview";
 
 import {
   isAbsolutePath,

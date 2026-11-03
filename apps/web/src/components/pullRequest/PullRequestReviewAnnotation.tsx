@@ -6,11 +6,11 @@ import type {
   PullRequestReviewThread,
   PullRequestThreadCommentsResult,
   PullRequestThreadComment,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { HammerIcon, MessageSquareIcon, Trash2Icon } from "lucide-react";
 import { Circle, CircleCheck } from "lucide";
 import { useRef, useState } from "react";
-import { settlePromise, squashAtomCommandFailure } from "@t3tools/client-runtime/state/runtime";
+import { settlePromise, squashAtomCommandFailure } from "@rosewood/client-runtime/state/runtime";
 
 import { RelativeTime } from "~/components/RelativeTime";
 import { cn } from "~/lib/utils";

@@ -8,7 +8,7 @@ import {
   reportAtomCommandResult,
   settlePromise,
   squashAtomCommandFailure,
-} from "@t3tools/client-runtime/state/runtime";
+} from "@rosewood/client-runtime/state/runtime";
 
 export type AppUpdateCheckState =
   | "idle"

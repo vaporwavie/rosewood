@@ -1,16 +1,16 @@
-import type { EnvironmentProject } from "@t3tools/client-runtime/state/shell";
-import type { VcsRef } from "@t3tools/client-runtime/state/vcs";
+import type { EnvironmentProject } from "@rosewood/client-runtime/state/shell";
+import type { VcsRef } from "@rosewood/client-runtime/state/vcs";
 import {
   type AtomCommandResult,
   mapAtomCommandResult,
-} from "@t3tools/client-runtime/state/runtime";
+} from "@rosewood/client-runtime/state/runtime";
 import type {
   VcsListRefsInput,
   VcsListRefsResult,
   VcsSwitchRefInput,
   VcsSwitchRefResult,
-} from "@t3tools/contracts";
-import { deriveLocalBranchNameFromRemoteRef } from "@t3tools/shared/git";
+} from "@rosewood/contracts";
+import { deriveLocalBranchNameFromRemoteRef } from "@rosewood/shared/git";
 import * as Cause from "effect/Cause";
 import { AsyncResult } from "effect/reactivity";
 

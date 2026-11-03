@@ -28,13 +28,13 @@ config.resolver = {
       : config.resolver?.blockList
         ? [config.resolver.blockList]
         : []),
-    new RegExp(`${escapedWorkspaceRoot}[/\\\\]\\.t3[/\\\\].*`),
+    new RegExp(`${escapedWorkspaceRoot}[/\\\\]\\.rosewood[/\\\\].*`),
   ],
   extraNodeModules: {
     ...config.resolver?.extraNodeModules,
-    "@t3tools/mobile-third-party-licenses": generatedLicenseModuleRoot,
-    "@t3tools/mobile-device-stream": generatedDeviceStreamRoot,
-    "@t3tools/mobile-preview-stream": generatedPreviewStreamRoot,
+    "@rosewood/mobile-third-party-licenses": generatedLicenseModuleRoot,
+    "@rosewood/mobile-device-stream": generatedDeviceStreamRoot,
+    "@rosewood/mobile-preview-stream": generatedPreviewStreamRoot,
   },
 };
 

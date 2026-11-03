@@ -3,17 +3,17 @@ import type {
   ProjectId,
   ProjectScript,
   EnvironmentId,
-} from "@t3tools/contracts";
-import { AuthSettingsWriteScope, EnvironmentAuthorizationError } from "@t3tools/contracts";
-import type { UnifiedSettings } from "@t3tools/contracts/settings";
+} from "@rosewood/contracts";
+import { AuthSettingsWriteScope, EnvironmentAuthorizationError } from "@rosewood/contracts";
+import type { UnifiedSettings } from "@rosewood/contracts/settings";
 import {
   isAtomCommandInterrupted,
   mapAtomCommandResult,
   squashAtomCommandFailure,
   type AtomCommandResult,
-} from "@t3tools/client-runtime/state/runtime";
-import type { EnvironmentProject } from "@t3tools/client-runtime/state/shell";
-import { resolveProjectScripts } from "@t3tools/shared/projectScripts";
+} from "@rosewood/client-runtime/state/runtime";
+import type { EnvironmentProject } from "@rosewood/client-runtime/state/shell";
+import { resolveProjectScripts } from "@rosewood/shared/projectScripts";
 import * as Cause from "effect/Cause";
 import { AsyncResult } from "effect/reactivity";
 import { useStableCallback } from "../../hooks/useStableCallback";

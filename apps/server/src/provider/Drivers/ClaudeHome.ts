@@ -1,12 +1,12 @@
-import type { ClaudeSettings, ProviderInstanceEnvironment } from "@t3tools/contracts";
+import type { ClaudeSettings, ProviderInstanceEnvironment } from "@rosewood/contracts";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import * as Schema from "effect/Schema";
 
-import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/instanceEnvironment";
-import { expandHomePath } from "@t3tools/provider-core/server/pathExpansion";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import { mergeProviderInstanceEnvironment } from "@rosewood/provider-core/server/instanceEnvironment";
+import { expandHomePath } from "@rosewood/provider-core/server/pathExpansion";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 
 import { readClaudeSettingsEnv } from "./ClaudeSkills.ts";
 
@@ -45,7 +45,7 @@ export const makeClaudeEnvironment = Effect.fn("makeClaudeEnvironment")(function
   };
 });
 
-// A Claude Code session that launched T3 exports these. A claude spawned with them acts as part of
+// A Claude Code session that launched Rosewood exports these. A claude spawned with them acts as part of
 // that session: its session id, messaging socket and token, and effort.
 const CLAUDE_HOST_SESSION_VARIABLES = [
   "CLAUDECODE",
@@ -63,8 +63,8 @@ const CLAUDE_HOST_SESSION_VARIABLES = [
 ];
 
 /**
- * Base env for the Claude processes T3 Code runs, before `makeClaudeEnvironment`.
- * Claude Code reads its entrypoint from the process env, not its settings `env`, so T3 Code applies that override itself.
+ * Base env for the Claude processes Rosewood runs, before `makeClaudeEnvironment`.
+ * Claude Code reads its entrypoint from the process env, not its settings `env`, so Rosewood applies that override itself.
  */
 export const mergeClaudeProcessEnvironment = Effect.fn("mergeClaudeProcessEnvironment")(function* (
   config: Pick<ClaudeSettings, "homePath">,
@@ -73,7 +73,7 @@ export const mergeClaudeProcessEnvironment = Effect.fn("mergeClaudeProcessEnviro
 ) {
   const baseEnvironment: NodeJS.ProcessEnv = {
     ...hostEnvironment,
-    CLAUDE_CODE_ENTRYPOINT: "t3-code",
+    CLAUDE_CODE_ENTRYPOINT: "rosewood",
   };
   for (const name of CLAUDE_HOST_SESSION_VARIABLES) delete baseEnvironment[name];
   const environment = yield* mergeProviderInstanceEnvironment(instanceEnvironment, baseEnvironment);

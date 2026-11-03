@@ -3,8 +3,8 @@ import * as NodeFSP from "node:fs/promises";
 import * as NodePath from "node:path";
 import * as NodeSqlite from "node:sqlite";
 
-import type { OrchestrationV2ProviderFailure } from "@t3tools/contracts";
-import { makeProviderFailure } from "@t3tools/provider-core/server/failure";
+import type { OrchestrationV2ProviderFailure } from "@rosewood/contracts";
+import { makeProviderFailure } from "@rosewood/provider-core/server/failure";
 import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";
 import * as Option from "effect/Option";

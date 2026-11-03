@@ -1,4 +1,4 @@
-import { SourceControlProviderKind } from "@t3tools/contracts";
+import { SourceControlProviderKind } from "@rosewood/contracts";
 import {
   EnvironmentId,
   ProjectId,
@@ -6,7 +6,7 @@ import {
   type PullRequestListInput,
   type PullRequestListResult,
   type PullRequestSummary,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
@@ -217,11 +217,11 @@ describe("pull request list answers across a reload", () => {
       provider: SourceControlProviderKind.make("github"),
       host: "github.com",
       projectId: ProjectId.make("project-1"),
-      projectTitle: "t3code",
-      repository: "pingdotgg/t3code",
+      projectTitle: "rosewood",
+      repository: "vaporwavie/rosewood",
       number,
       title: `Pull request ${number}`,
-      url: `https://github.com/pingdotgg/t3code/pull/${number}`,
+      url: `https://github.com/vaporwavie/rosewood/pull/${number}`,
       author: { login: "octocat", name: null, avatarUrl: null },
       headBranch: `feat/branch-${number}`,
       baseBranch: "main",
@@ -249,9 +249,11 @@ describe("pull request list answers across a reload", () => {
           detail: null,
         },
       ],
-      errors: [{ projectId: ProjectId.make("project-1"), projectTitle: "t3code", message: "boom" }],
+      errors: [
+        { projectId: ProjectId.make("project-1"), projectTitle: "rosewood", message: "boom" },
+      ],
       truncated: true,
-      nextCursors: { "pingdotgg/t3code": "cursor-1" },
+      nextCursors: { "vaporwavie/rosewood": "cursor-1" },
     }) as PullRequestListResult;
   const local = EnvironmentId.make("env-local");
   const remote = EnvironmentId.make("env-remote");
@@ -308,7 +310,7 @@ describe("pull request list answers across a reload", () => {
     rememberPullRequestListAnswer(storage, { environmentId: local, input }, answer(rows));
     const searched = { ...input, query: "fix" };
     rememberPullRequestListAnswer(storage, { environmentId: local, input: searched }, answer(rows));
-    const continued = { ...input, cursors: { "pingdotgg/t3code": "cursor-1" } };
+    const continued = { ...input, cursors: { "vaporwavie/rosewood": "cursor-1" } };
     rememberPullRequestListAnswer(
       storage,
       { environmentId: local, input: continued },
@@ -458,13 +460,13 @@ describe("pull request list answers across a reload", () => {
 
   it("removes the composite snapshots it replaced", () => {
     const storage = makeStorage();
-    storage.held.set("t3.pullRequests.list:env-local,env-remote", "{}");
-    storage.held.set("t3.pullRequests.list:env-local", "{}");
-    storage.held.set("t3.other", "kept");
+    storage.held.set("rosewood.pullRequests.list:env-local,env-remote", "{}");
+    storage.held.set("rosewood.pullRequests.list:env-local", "{}");
+    storage.held.set("rosewood.other", "kept");
     rememberPullRequestListAnswer(storage, { environmentId: local, input }, answer([]));
     expect(
-      [...storage.held.keys()].filter((key) => key.startsWith("t3.pullRequests.list:")),
+      [...storage.held.keys()].filter((key) => key.startsWith("rosewood.pullRequests.list:")),
     ).toEqual([]);
-    expect(storage.held.get("t3.other")).toBe("kept");
+    expect(storage.held.get("rosewood.other")).toBe("kept");
   });
 });

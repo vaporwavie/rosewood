@@ -3,8 +3,8 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import * as NodeFS from "node:fs";
 import * as NodeOS from "node:os";
 import * as NodePath from "node:path";
-import * as NetService from "@t3tools/shared/Net";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as NetService from "@rosewood/shared/Net";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import { assert, describe, it } from "@effect/vitest";
 import * as ByteSize from "effect/ByteSize";
 import * as ConfigProvider from "effect/ConfigProvider";
@@ -56,7 +56,7 @@ function mockProcess(exit: number | PlatformError.PlatformError) {
 
 const devServerInput = {
   mode: "dev:server",
-  t3Home: "/tmp/t3code-dev-runner",
+  rosewoodHome: "/tmp/rosewood-dev-runner",
   browser: undefined,
   autoBootstrapProjectFromCwd: undefined,
   logWebSocketEvents: undefined,
@@ -74,10 +74,10 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
     it.effect("forwards the reusable auth token to web dev and removes it for desktop", () =>
       Effect.gen(function* () {
         const input = {
-          baseEnv: { T3CODE_DEV_AUTH_TOKEN: "reusable-dev-auth-token-that-is-long-enough" },
+          baseEnv: { ROSEWOOD_DEV_AUTH_TOKEN: "reusable-dev-auth-token-that-is-long-enough" },
           serverOffset: 0,
           webOffset: 0,
-          t3Home: undefined,
+          rosewoodHome: undefined,
           browser: undefined,
           autoBootstrapProjectFromCwd: undefined,
           logWebSocketEvents: undefined,
@@ -88,8 +88,8 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
         const web = yield* createDevRunnerEnv({ ...input, mode: "dev" });
         const desktop = yield* createDevRunnerEnv({ ...input, mode: "dev:desktop" });
 
-        assert.equal(web.T3CODE_DEV_AUTH_TOKEN, input.baseEnv.T3CODE_DEV_AUTH_TOKEN);
-        assert.equal(desktop.T3CODE_DEV_AUTH_TOKEN, undefined);
+        assert.equal(web.ROSEWOOD_DEV_AUTH_TOKEN, input.baseEnv.ROSEWOOD_DEV_AUTH_TOKEN);
+        assert.equal(desktop.ROSEWOOD_DEV_AUTH_TOKEN, undefined);
       }),
     );
 
@@ -99,7 +99,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           mode: "dev",
           serverOffset: 0,
           webOffset: 0,
-          t3Home: undefined,
+          rosewoodHome: undefined,
           browser: undefined,
           autoBootstrapProjectFromCwd: undefined,
           logWebSocketEvents: undefined,
@@ -110,11 +110,11 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
         const byDefault = yield* createDevRunnerEnv({ ...input, baseEnv: {} });
         const optedIn = yield* createDevRunnerEnv({
           ...input,
-          baseEnv: { T3CODE_TELEMETRY_ENABLED: "true" },
+          baseEnv: { ROSEWOOD_TELEMETRY_ENABLED: "true" },
         });
 
-        assert.equal(byDefault.T3CODE_TELEMETRY_ENABLED, "false");
-        assert.equal(optedIn.T3CODE_TELEMETRY_ENABLED, "true");
+        assert.equal(byDefault.ROSEWOOD_TELEMETRY_ENABLED, "false");
+        assert.equal(optedIn.ROSEWOOD_TELEMETRY_ENABLED, "true");
       }),
     );
 
@@ -123,12 +123,12 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
         const env = yield* createDevRunnerEnv({
           mode: "dev",
           baseEnv: {
-            T3_SERVICE_LAUNCHER_CONTEXT: '{"childVersion":"9.9.9"}',
-            T3_BOOT_SERVICE_UNIT: "t3code.service",
+            ROSEWOOD_SERVICE_LAUNCHER_CONTEXT: '{"childVersion":"9.9.9"}',
+            ROSEWOOD_BOOT_SERVICE_UNIT: "rosewood.service",
           },
           serverOffset: 0,
           webOffset: 0,
-          t3Home: undefined,
+          rosewoodHome: undefined,
           browser: undefined,
           autoBootstrapProjectFromCwd: undefined,
           logWebSocketEvents: undefined,
@@ -137,8 +137,8 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           devUrl: undefined,
         });
 
-        assert.equal(env.T3_SERVICE_LAUNCHER_CONTEXT, undefined);
-        assert.equal(env.T3_BOOT_SERVICE_UNIT, undefined);
+        assert.equal(env.ROSEWOOD_SERVICE_LAUNCHER_CONTEXT, undefined);
+        assert.equal(env.ROSEWOOD_BOOT_SERVICE_UNIT, undefined);
       }),
     );
 
@@ -154,7 +154,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
             },
             serverOffset: 0,
             webOffset: 0,
-            t3Home: undefined,
+            rosewoodHome: undefined,
             browser: undefined,
             autoBootstrapProjectFromCwd: undefined,
             logWebSocketEvents: undefined,
@@ -165,8 +165,8 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
 
           assert.equal(env.VITE_HTTP_URL, undefined);
           assert.equal(env.VITE_WS_URL, undefined);
-          assert.equal(env.T3CODE_PORT, "13773");
-          assert.equal(env.T3CODE_SINGLE_ORIGIN_DEV, "1");
+          assert.equal(env.ROSEWOOD_PORT, "13773");
+          assert.equal(env.ROSEWOOD_SINGLE_ORIGIN_DEV, "1");
         }),
     );
 
@@ -177,7 +177,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           baseEnv: { HOST: "0.0.0.0" },
           serverOffset: 0,
           webOffset: 0,
-          t3Home: undefined,
+          rosewoodHome: undefined,
           browser: undefined,
           autoBootstrapProjectFromCwd: undefined,
           logWebSocketEvents: undefined,
@@ -392,14 +392,14 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
       });
     });
 
-    it.effect("ignores an ambient T3CODE_HOME when no home is resolved", () =>
+    it.effect("ignores an ambient ROSEWOOD_HOME when no home is resolved", () =>
       Effect.gen(function* () {
         const env = yield* createDevRunnerEnv({
           mode: "dev",
-          baseEnv: { T3CODE_HOME: "/home/user/.t3" },
+          baseEnv: { ROSEWOOD_HOME: "/home/user/.rosewood" },
           serverOffset: 0,
           webOffset: 0,
-          t3Home: undefined,
+          rosewoodHome: undefined,
           browser: undefined,
           autoBootstrapProjectFromCwd: undefined,
           logWebSocketEvents: undefined,
@@ -408,20 +408,20 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           devUrl: undefined,
         });
 
-        assert.equal(env.T3CODE_HOME, undefined);
+        assert.equal(env.ROSEWOOD_HOME, undefined);
       }),
     );
 
-    it.effect("expands a home-relative T3 home the way the server does", () =>
+    it.effect("expands a home-relative Rosewood home the way the server does", () =>
       Effect.gen(function* () {
         const path = yield* Path.Path;
-        const homeFor = (t3Home: string) =>
+        const homeFor = (rosewoodHome: string) =>
           createDevRunnerEnv({
             mode: "dev",
             baseEnv: {},
             serverOffset: 0,
             webOffset: 0,
-            t3Home,
+            rosewoodHome,
             browser: undefined,
             autoBootstrapProjectFromCwd: undefined,
             logWebSocketEvents: undefined,
@@ -430,16 +430,22 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
             devUrl: undefined,
           }).pipe(
             Effect.provideService(HostProcess.HomeDirectory, "/home/dev"),
-            Effect.map((env) => env.T3CODE_HOME),
+            Effect.map((env) => env.ROSEWOOD_HOME),
           );
 
-        assert.equal(yield* homeFor("~/t3-dev"), path.join("/home/dev", "t3-dev"));
+        assert.equal(yield* homeFor("~/rosewood-dev"), path.join("/home/dev", "rosewood-dev"));
         assert.equal(yield* homeFor("~"), "/home/dev");
-        assert.equal(yield* homeFor("~\\t3-dev"), path.join("/home/dev", "t3-dev"));
-        assert.equal(yield* homeFor("  ~/t3-dev  "), path.join("/home/dev", "t3-dev"));
-        assert.equal(yield* homeFor("~someone/t3-dev"), path.resolve("~someone/t3-dev"));
-        assert.equal(yield* homeFor("relative/t3-dev"), path.resolve("relative/t3-dev"));
-        assert.equal(yield* homeFor("/tmp/t3-dev"), path.resolve("/tmp/t3-dev"));
+        assert.equal(yield* homeFor("~\\rosewood-dev"), path.join("/home/dev", "rosewood-dev"));
+        assert.equal(yield* homeFor("  ~/rosewood-dev  "), path.join("/home/dev", "rosewood-dev"));
+        assert.equal(
+          yield* homeFor("~someone/rosewood-dev"),
+          path.resolve("~someone/rosewood-dev"),
+        );
+        assert.equal(
+          yield* homeFor("relative/rosewood-dev"),
+          path.resolve("relative/rosewood-dev"),
+        );
+        assert.equal(yield* homeFor("/tmp/rosewood-dev"), path.resolve("/tmp/rosewood-dev"));
       }),
     );
 
@@ -474,7 +480,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
     // A shared origin means a remote browser, where unbundled dev's
     // per-module waterfall pays a tailnet round trip per import level. The
     // runner defaults bundled dev on for the spawned stack, but only
-    // defaults: an explicit T3CODE_BUNDLED_DEV (even "0") must pass through.
+    // defaults: an explicit ROSEWOOD_BUNDLED_DEV (even "0") must pass through.
     describe("--share spawn wiring", () => {
       const shareSpawned = (input: {
         readonly ambientBundledDev?: string | undefined;
@@ -537,17 +543,17 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
               HostProcess.Environment,
               input.ambientBundledDev === undefined
                 ? {}
-                : { T3CODE_BUNDLED_DEV: input.ambientBundledDev },
+                : { ROSEWOOD_BUNDLED_DEV: input.ambientBundledDev },
             ),
           );
 
           return { env: captured, vpArgs, tailscaleCalls };
         });
 
-      it.effect("keeps an explicit T3CODE_BUNDLED_DEV=0 opt-out", () =>
+      it.effect("keeps an explicit ROSEWOOD_BUNDLED_DEV=0 opt-out", () =>
         Effect.gen(function* () {
           const { env } = yield* shareSpawned({ ambientBundledDev: "0" });
-          assert.equal(env?.T3CODE_BUNDLED_DEV, "0");
+          assert.equal(env?.ROSEWOOD_BUNDLED_DEV, "0");
         }),
       );
 
@@ -555,13 +561,13 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
         Effect.gen(function* () {
           const { env, vpArgs, tailscaleCalls } = yield* shareSpawned({ built: true });
           assert.include(vpArgs, "dev:built");
-          assert.equal(env?.T3CODE_BUILT_DEV, "1");
-          assert.equal(env?.T3CODE_BUNDLED_DEV, undefined);
+          assert.equal(env?.ROSEWOOD_BUILT_DEV, "1");
+          assert.equal(env?.ROSEWOOD_BUNDLED_DEV, undefined);
           assert.equal(env?.VITE_DEV_SERVER_URL, `https://host.example.ts.net:${env?.PORT}/`);
           const serve = tailscaleCalls.find((args) => args.includes("--bg"));
           assert.deepEqual(serve?.slice(-2), [
             `--https=${env?.PORT}`,
-            `http://127.0.0.1:${env?.T3CODE_PORT}`,
+            `http://127.0.0.1:${env?.ROSEWOOD_PORT}`,
           ]);
         }),
       );
@@ -570,7 +576,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
         Effect.gen(function* () {
           const { env, tailscaleCalls } = yield* shareSpawned({ built: true, host: "::1" });
           const serve = tailscaleCalls.find((args) => args.includes("--bg"));
-          assert.equal(serve?.at(-1), `http://[::1]:${env?.T3CODE_PORT}`);
+          assert.equal(serve?.at(-1), `http://[::1]:${env?.ROSEWOOD_PORT}`);
         }),
       );
 
@@ -579,7 +585,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           const { env, vpArgs, tailscaleCalls } = yield* shareSpawned({});
           assert.include(vpArgs, "dev");
           assert.notInclude(vpArgs, "dev:built");
-          assert.equal(env?.T3CODE_BUNDLED_DEV, "1");
+          assert.equal(env?.ROSEWOOD_BUNDLED_DEV, "1");
           const serve = tailscaleCalls.find((args) => args.includes("--bg"));
           assert.equal(serve?.at(-1), `http://localhost:${env?.PORT}`);
         }),
@@ -640,10 +646,10 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
       });
     });
 
-    describe("t3 home precedence", () => {
+    describe("rosewood home precedence", () => {
       const makeWorktree = Effect.acquireRelease(
         Effect.sync(() => {
-          const root = NodeFS.mkdtempSync(NodePath.join(NodeOS.tmpdir(), "t3-devrunner-"));
+          const root = NodeFS.mkdtempSync(NodePath.join(NodeOS.tmpdir(), "rosewood-devrunner-"));
           NodeFS.writeFileSync(
             NodePath.join(root, ".git"),
             "gitdir: /elsewhere/.git/worktrees/x\n",
@@ -654,7 +660,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
       );
 
       const spawnedHome = (input: {
-        readonly t3Home: string | undefined;
+        readonly rosewoodHome: string | undefined;
         readonly cwd: string;
         readonly ambientHome: string | undefined;
       }) =>
@@ -672,19 +678,22 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
             }),
           );
 
-          yield* runDevRunnerWithInput({ ...devServerInput, t3Home: input.t3Home }).pipe(
+          yield* runDevRunnerWithInput({
+            ...devServerInput,
+            rosewoodHome: input.rosewoodHome,
+          }).pipe(
             Effect.provide(Layer.mergeAll(emptyConfigLayer, netServiceLayer, spawnerLayer)),
             Effect.provideService(HostProcess.Platform, "linux"),
             Effect.provideService(HostProcess.WorkingDirectory, input.cwd),
-            // No ~/.t3 here, so these runs never seed from this machine's install.
+            // No ~/.rosewood here, so these runs never seed from this machine's install.
             Effect.provideService(HostProcess.HomeDirectory, input.cwd),
             Effect.provideService(
               HostProcess.Environment,
-              input.ambientHome === undefined ? {} : { T3CODE_HOME: input.ambientHome },
+              input.ambientHome === undefined ? {} : { ROSEWOOD_HOME: input.ambientHome },
             ),
           );
 
-          return captured?.T3CODE_HOME;
+          return captured?.ROSEWOOD_HOME;
         });
 
       it.effect("prefers an explicit --home-dir over the worktree default", () =>
@@ -692,9 +701,9 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           const path = yield* Path.Path;
           const root = yield* makeWorktree;
           const home = yield* spawnedHome({
-            t3Home: "/tmp/explicit-home",
+            rosewoodHome: "/tmp/explicit-home",
             cwd: root,
-            ambientHome: "/home/user/.t3",
+            ambientHome: "/home/user/.rosewood",
           });
           assert.equal(home, path.resolve("/tmp/explicit-home"));
         }).pipe(Effect.scoped),
@@ -705,34 +714,34 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           const path = yield* Path.Path;
           const root = yield* makeWorktree;
           const home = yield* spawnedHome({
-            t3Home: "   ",
+            rosewoodHome: "   ",
             cwd: root,
-            ambientHome: "/home/user/.t3",
+            ambientHome: "/home/user/.rosewood",
           });
-          assert.equal(home, path.join(path.resolve(root), ".t3"));
+          assert.equal(home, path.join(path.resolve(root), ".rosewood"));
         }).pipe(Effect.scoped),
       );
 
-      it.effect("prefers the worktree .t3 over an ambient T3CODE_HOME", () =>
+      it.effect("prefers the worktree .rosewood over an ambient ROSEWOOD_HOME", () =>
         Effect.gen(function* () {
           const path = yield* Path.Path;
           const root = yield* makeWorktree;
           const home = yield* spawnedHome({
-            t3Home: undefined,
+            rosewoodHome: undefined,
             cwd: root,
-            ambientHome: "/home/user/.t3",
+            ambientHome: "/home/user/.rosewood",
           });
-          assert.equal(home, path.join(path.resolve(root), ".t3"));
+          assert.equal(home, path.join(path.resolve(root), ".rosewood"));
         }).pipe(Effect.scoped),
       );
 
-      it.effect("seeds a worktree database from ~/.t3 only when it has none", () =>
+      it.effect("seeds a worktree database from ~/.rosewood only when it has none", () =>
         Effect.gen(function* () {
           const path = yield* Path.Path;
           const root = yield* makeWorktree;
           const home = path.join(root, "home");
-          NodeFS.mkdirSync(path.join(home, ".t3", "userdata"), { recursive: true });
-          NodeFS.writeFileSync(path.join(home, ".t3", "userdata", "statev2.sqlite"), "");
+          NodeFS.mkdirSync(path.join(home, ".rosewood", "userdata"), { recursive: true });
+          NodeFS.writeFileSync(path.join(home, ".rosewood", "userdata", "statev2.sqlite"), "");
 
           const spawnedArgs = (seed: boolean | undefined) =>
             Effect.gen(function* () {
@@ -746,7 +755,11 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
                   return Effect.succeed(mockProcess(0));
                 }),
               );
-              yield* runDevRunnerWithInput({ ...devServerInput, t3Home: undefined, seed }).pipe(
+              yield* runDevRunnerWithInput({
+                ...devServerInput,
+                rosewoodHome: undefined,
+                seed,
+              }).pipe(
                 Effect.provide(Layer.mergeAll(emptyConfigLayer, netServiceLayer, spawnerLayer)),
                 Effect.provideService(HostProcess.Platform, "linux"),
                 Effect.provideService(HostProcess.WorkingDirectory, root),
@@ -760,11 +773,14 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
 
           assert.deepStrictEqual(yield* spawnedArgs(false), []);
           const [seedArgs] = yield* spawnedArgs(undefined);
-          assert.includeMembers([...(seedArgs ?? [])], ["--base-dir", path.join(root, ".t3")]);
+          assert.includeMembers(
+            [...(seedArgs ?? [])],
+            ["--base-dir", path.join(root, ".rosewood")],
+          );
 
           // Either database means the worktree already has data.
           for (const name of ["state.sqlite", "statev2.sqlite"]) {
-            const file = path.join(root, ".t3", "userdata", name);
+            const file = path.join(root, ".rosewood", "userdata", name);
             NodeFS.mkdirSync(path.dirname(file), { recursive: true });
             NodeFS.writeFileSync(file, "");
             assert.deepStrictEqual(yield* spawnedArgs(undefined), []);
@@ -785,7 +801,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
             const path = yield* Path.Path;
             const root = yield* makeWorktree;
             const home = path.join(root, "home");
-            const source = path.join(home, ".t3", "userdata", "statev2.sqlite");
+            const source = path.join(home, ".rosewood", "userdata", "statev2.sqlite");
             NodeFS.mkdirSync(path.dirname(source), { recursive: true });
             NodeFS.writeFileSync(source, "");
             const spawned: Array<ReadonlyArray<string>> = [];
@@ -798,7 +814,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
               }),
             );
 
-            yield* runDevRunnerWithInput({ ...devServerInput, t3Home: undefined }).pipe(
+            yield* runDevRunnerWithInput({ ...devServerInput, rosewoodHome: undefined }).pipe(
               Effect.provide([
                 emptyConfigLayer,
                 netServiceLayer,
@@ -832,7 +848,7 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
             );
             assert.deepStrictEqual(spawned.at(-1), [
               "run",
-              "--filter=t3",
+              "--filter=rosewood",
               "dev",
               ...devServerInput.runArgs,
             ]);
@@ -847,15 +863,15 @@ it.layer(NodeServices.layer)("dev-runner", (it) => {
           }).pipe(Effect.scoped),
       );
 
-      it.effect("falls back to an ambient T3CODE_HOME outside a worktree", () =>
+      it.effect("falls back to an ambient ROSEWOOD_HOME outside a worktree", () =>
         Effect.gen(function* () {
           const path = yield* Path.Path;
           const home = yield* spawnedHome({
-            t3Home: undefined,
+            rosewoodHome: undefined,
             cwd: NodeOS.tmpdir(),
-            ambientHome: "/home/user/.t3",
+            ambientHome: "/home/user/.rosewood",
           });
-          assert.equal(home, path.resolve("/home/user/.t3"));
+          assert.equal(home, path.resolve("/home/user/.rosewood"));
         }),
       );
     });

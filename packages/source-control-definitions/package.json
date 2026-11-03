@@ -1,5 +1,5 @@
 {
-  "name": "@t3tools/source-control-definitions",
+  "name": "@rosewood/source-control-definitions",
   "private": true,
   "type": "module",
   "exports": {
@@ -12,12 +12,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@t3tools/source-control-azure-devops": "workspace:*",
-    "@t3tools/source-control-bitbucket": "workspace:*",
-    "@t3tools/source-control-core": "workspace:*",
-    "@t3tools/source-control-forgejo": "workspace:*",
-    "@t3tools/source-control-gitcafe": "workspace:*",
-    "@t3tools/source-control-github": "workspace:*",
-    "@t3tools/source-control-gitlab": "workspace:*"
+    "@rosewood/source-control-azure-devops": "workspace:*",
+    "@rosewood/source-control-bitbucket": "workspace:*",
+    "@rosewood/source-control-core": "workspace:*",
+    "@rosewood/source-control-forgejo": "workspace:*",
+    "@rosewood/source-control-gitcafe": "workspace:*",
+    "@rosewood/source-control-github": "workspace:*",
+    "@rosewood/source-control-gitlab": "workspace:*"
   }
 }

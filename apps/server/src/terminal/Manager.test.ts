@@ -10,8 +10,8 @@ import {
   ProviderInstanceId,
   ProjectId,
   TerminalProviderInstanceNotFoundError,
-} from "@t3tools/contracts";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+} from "@rosewood/contracts";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import * as Clock from "effect/Clock";
 import * as Deferred from "effect/Deferred";
 import * as Duration from "effect/Duration";
@@ -40,7 +40,7 @@ import * as ProjectService from "../project/ProjectService.ts";
 import * as ProjectSetupScriptRunner from "../project/ProjectSetupScriptRunner.ts";
 import * as TerminalManager from "./Manager.ts";
 import { terminalOutputStream } from "./OutputProtocol.ts";
-import * as PtyAdapter from "@t3tools/shared/PtyAdapter";
+import * as PtyAdapter from "@rosewood/shared/PtyAdapter";
 
 vi.mock("effect/SynchronizedRef", async (importOriginal) => {
   const original = await importOriginal<typeof SynchronizedRef>();
@@ -264,7 +264,7 @@ const createManager = (
   Effect.flatMap(Effect.service(FileSystem.FileSystem), (fs) =>
     Effect.gen(function* () {
       const { join } = yield* Path.Path;
-      const baseDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3code-terminal-" });
+      const baseDir = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-terminal-" });
       const logsDir = join(baseDir, "userdata", "logs", "terminals");
       const ptyAdapter = options.ptyAdapter ?? new FakePtyAdapter();
 
@@ -1620,7 +1620,7 @@ it.layer(
       const fileSystem = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const cacheDir = yield* fileSystem.makeTempDirectoryScoped({
-        prefix: "t3-terminal-acp-path-",
+        prefix: "rosewood-terminal-acp-path-",
       });
       const installBin = path.join(
         cacheDir,
@@ -1842,7 +1842,7 @@ it.layer(
       const { manager, ptyAdapter } = yield* createManager(5, {
         env: {
           PORT: "5173",
-          T3CODE_PORT: "3773",
+          ROSEWOOD_PORT: "3773",
           VITE_DEV_SERVER_URL: "http://localhost:5173",
           TEST_TERMINAL_KEEP: "keep-me",
           TMUX: "/tmp/tmux-1000/default,1234,0",
@@ -1858,7 +1858,7 @@ it.layer(
       if (!spawnInput) return;
 
       expect(spawnInput.env.PORT).toBeUndefined();
-      expect(spawnInput.env.T3CODE_PORT).toBeUndefined();
+      expect(spawnInput.env.ROSEWOOD_PORT).toBeUndefined();
       expect(spawnInput.env.VITE_DEV_SERVER_URL).toBeUndefined();
       expect(spawnInput.env.TEST_TERMINAL_KEEP).toBe("keep-me");
       expect(spawnInput.env.TMUX).toBeUndefined();
@@ -1871,12 +1871,12 @@ it.layer(
 
   it.effect("strips AppImage runtime env from terminal sessions", () =>
     Effect.gen(function* () {
-      const appDir = "/tmp/.mount_T3Codeabc123";
+      const appDir = "/tmp/.mount_RosewoodCodeabc123";
       const { manager, ptyAdapter } = yield* createManager(5, {
         env: {
-          APPIMAGE: "/home/user/T3-Code.AppImage",
+          APPIMAGE: "/home/user/Rosewood.AppImage",
           APPDIR: appDir,
-          ARGV0: "/home/user/T3-Code.AppImage",
+          ARGV0: "/home/user/Rosewood.AppImage",
           OWD: "/home/user/project",
           PATH: `${appDir}/usr/bin:${appDir}:/usr/local/bin:/usr/bin:/bin`,
           LD_LIBRARY_PATH: `${appDir}/usr/lib:/home/user/.local/lib`,
@@ -1906,7 +1906,7 @@ it.layer(
     Effect.gen(function* () {
       const providerInstanceId = ProviderInstanceId.make("codex_work");
       const { manager, ptyAdapter } = yield* createManager(5, {
-        env: { T3CODE_SECRET: "server-only" },
+        env: { ROSEWOOD_SECRET: "server-only" },
         resolveProviderInstanceEnvironment: (requestedId, env) =>
           Effect.succeed({
             ...env,
@@ -1922,7 +1922,7 @@ it.layer(
       expect(ptyAdapter.spawnInputs[0]?.env.PROVIDER_SECRET).toBe("secret-value");
       expect(ptyAdapter.spawnInputs[0]?.env.CODEX_HOME).toBe("/accounts/codex-work");
       expect(ptyAdapter.spawnInputs[0]?.env.CLIENT_FLAG).toBe("1");
-      expect(ptyAdapter.spawnInputs[0]?.env.T3CODE_SECRET).toBeUndefined();
+      expect(ptyAdapter.spawnInputs[0]?.env.ROSEWOOD_SECRET).toBeUndefined();
       expect(snapshot).not.toHaveProperty("env");
       expect(snapshot).not.toHaveProperty("providerInstanceId");
     }),

@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, describe, it } from "@effect/vitest";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import * as Cause from "effect/Cause";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
@@ -33,11 +33,11 @@ const makeEnvironment = (path: Path.Path, overrides: Record<string, unknown> = {
     platform: "linux",
     isPackaged: true,
     isDevelopment: false,
-    displayName: "T3 Code (Alpha)",
-    linuxDesktopEntryName: "com.t3tools.T3Code.desktop",
+    displayName: "Rosewood (Alpha)",
+    linuxDesktopEntryName: "io.github.vaporwavie.Rosewood.desktop",
     linuxApplicationsDir: "/home/alice/.local/share/applications",
     desktopLauncherPath: Option.none(),
-    appImagePath: Option.some("/home/alice/Applications/T3-Code.AppImage"),
+    appImagePath: Option.some("/home/alice/Applications/Rosewood.AppImage"),
     path,
     ...overrides,
   } as unknown as DesktopEnvironment.DesktopEnvironment["Service"]);
@@ -167,22 +167,22 @@ const emptyRecording = (): RecordedRegistration => ({
 describe("DesktopLinuxUrlHandler", () => {
   it("renders a scheme-handler desktop entry with freedesktop Exec quoting", () => {
     const entry = DesktopLinuxUrlHandler.renderUrlHandlerDesktopEntry({
-      displayName: "T3 Code (Nightly)",
-      execTarget: '/home/al ice/Apps/T3 "100%" $HOME\\x.AppImage',
-      scheme: "t3code",
-      iconPath: "/home/al ice/icons/T3\\x.png",
+      displayName: "Rosewood (Nightly)",
+      execTarget: '/home/al ice/Apps/Rosewood "100%" $HOME\\x.AppImage',
+      scheme: "rosewood",
+      iconPath: "/home/al ice/icons/Rosewood\\x.png",
     });
 
     assert.include(entry, "[Desktop Entry]");
-    assert.include(entry, "Name=T3 Code (Nightly)");
+    assert.include(entry, "Name=Rosewood (Nightly)");
     assert.include(
       entry,
-      'Exec="/home/al ice/Apps/T3 \\\\"100%%\\\\" \\\\$HOME\\\\\\\\x.AppImage" %U',
+      'Exec="/home/al ice/Apps/Rosewood \\\\"100%%\\\\" \\\\$HOME\\\\\\\\x.AppImage" %U',
     );
     assert.include(entry, "NoDisplay=true");
     assert.notInclude(entry, "StartupWMClass=");
-    assert.include(entry, "MimeType=x-scheme-handler/t3code;");
-    assert.include(entry, "Icon=/home/al ice/icons/T3\\\\x.png");
+    assert.include(entry, "MimeType=x-scheme-handler/rosewood;");
+    assert.include(entry, "Icon=/home/al ice/icons/Rosewood\\\\x.png");
   });
 
   it.effect(
@@ -197,13 +197,13 @@ describe("DesktopLinuxUrlHandler", () => {
         assert.equal(recorded.files.length, 1);
         assert.equal(
           recorded.files[0]?.path,
-          "/home/alice/.local/share/applications/com.t3tools.T3Code.desktop",
+          "/home/alice/.local/share/applications/io.github.vaporwavie.Rosewood.desktop",
         );
         assert.include(
           recorded.files[0]?.content,
-          "Exec=/home/alice/Applications/T3-Code.AppImage %U",
+          "Exec=/home/alice/Applications/Rosewood.AppImage %U",
         );
-        assert.include(recorded.files[0]?.content, "MimeType=x-scheme-handler/t3code;");
+        assert.include(recorded.files[0]?.content, "MimeType=x-scheme-handler/rosewood;");
         assert.deepEqual(recorded.commands, [
           {
             command: "update-desktop-database",
@@ -211,7 +211,7 @@ describe("DesktopLinuxUrlHandler", () => {
           },
           {
             command: "xdg-mime",
-            args: ["default", "com.t3tools.T3Code.desktop", "x-scheme-handler/t3code"],
+            args: ["default", "io.github.vaporwavie.Rosewood.desktop", "x-scheme-handler/rosewood"],
           },
         ]);
       });
@@ -227,10 +227,10 @@ describe("DesktopLinuxUrlHandler", () => {
       assert.include(
         recorded.files[0]?.content,
         DesktopLinuxUrlHandler.renderUrlHandlerDesktopEntry({
-          displayName: "T3 Code (Alpha)",
+          displayName: "Rosewood (Alpha)",
           execTarget: process.execPath,
-          scheme: "t3code",
-          iconPath: "/home/alice/.local/share/icons/com.t3tools.T3Code.desktop.png",
+          scheme: "rosewood",
+          iconPath: "/home/alice/.local/share/icons/io.github.vaporwavie.Rosewood.desktop.png",
         }),
       );
     });
@@ -241,10 +241,10 @@ describe("DesktopLinuxUrlHandler", () => {
 
     return Effect.gen(function* () {
       yield* runRegister(recorded, {
-        environment: { desktopLauncherPath: Option.some("/opt/T3 Code/t3code") },
+        environment: { desktopLauncherPath: Option.some("/opt/Rosewood/rosewood") },
       });
 
-      assert.include(recorded.files[0]?.content, 'Exec="/opt/T3 Code/t3code" %U');
+      assert.include(recorded.files[0]?.content, "Exec=/opt/Rosewood/rosewood %U");
     });
   });
 
@@ -254,10 +254,10 @@ describe("DesktopLinuxUrlHandler", () => {
     return Effect.gen(function* () {
       yield* runRegister(recorded, {
         existingEntry: DesktopLinuxUrlHandler.renderUrlHandlerDesktopEntry({
-          displayName: "T3 Code (Alpha)",
-          execTarget: "/home/alice/Applications/T3-Code.AppImage",
-          scheme: "t3code",
-          iconPath: "/home/alice/.local/share/icons/com.t3tools.T3Code.desktop.png",
+          displayName: "Rosewood (Alpha)",
+          execTarget: "/home/alice/Applications/Rosewood.AppImage",
+          scheme: "rosewood",
+          iconPath: "/home/alice/.local/share/icons/io.github.vaporwavie.Rosewood.desktop.png",
         }),
       });
 
@@ -270,7 +270,7 @@ describe("DesktopLinuxUrlHandler", () => {
         },
         {
           command: "xdg-mime",
-          args: ["default", "com.t3tools.T3Code.desktop", "x-scheme-handler/t3code"],
+          args: ["default", "io.github.vaporwavie.Rosewood.desktop", "x-scheme-handler/rosewood"],
         },
       ]);
     });
@@ -278,20 +278,20 @@ describe("DesktopLinuxUrlHandler", () => {
 
   it.effect("installs a persistent icon even when the desktop entry is already current", () => {
     const recorded = emptyRecording();
-    const iconPath = "/home/alice/.local/share/icons/com.t3tools.T3Code.desktop.png";
+    const iconPath = "/home/alice/.local/share/icons/io.github.vaporwavie.Rosewood.desktop.png";
     return Effect.gen(function* () {
       yield* runRegister(recorded, {
-        iconSource: "/tmp/.mount_T3/resources/icon.png",
+        iconSource: "/tmp/.mount_Rosewood/resources/icon.png",
         existingEntry: DesktopLinuxUrlHandler.renderUrlHandlerDesktopEntry({
-          displayName: "T3 Code (Alpha)",
-          execTarget: "/home/alice/Applications/T3-Code.AppImage",
-          scheme: "t3code",
+          displayName: "Rosewood (Alpha)",
+          execTarget: "/home/alice/Applications/Rosewood.AppImage",
+          scheme: "rosewood",
           iconPath,
         }),
       });
       assert.deepEqual(recorded.files, []);
       assert.deepEqual(recorded.copies, [
-        { source: "/tmp/.mount_T3/resources/icon.png", destination: iconPath },
+        { source: "/tmp/.mount_Rosewood/resources/icon.png", destination: iconPath },
       ]);
       assert.equal(recorded.commands.at(-1)?.command, "xdg-mime");
     });
@@ -301,7 +301,7 @@ describe("DesktopLinuxUrlHandler", () => {
     const recorded = emptyRecording();
     return Effect.gen(function* () {
       yield* runRegister(recorded, {
-        iconSource: "/tmp/.mount_T3/resources/icon.png",
+        iconSource: "/tmp/.mount_Rosewood/resources/icon.png",
         iconCopyError: PlatformError.systemError({
           _tag: "PermissionDenied",
           module: "FileSystem",
@@ -326,14 +326,14 @@ describe("DesktopLinuxUrlHandler", () => {
       yield* runRegister(unpackaged, {
         environment: {
           isPackaged: false,
-          linuxDesktopEntryName: "com.t3tools.T3Code.Development.desktop",
+          linuxDesktopEntryName: "io.github.vaporwavie.Rosewood.Development.desktop",
         },
       });
 
       assert.deepEqual(nonLinux.files, []);
       assert.equal(
         unpackaged.files[0]?.path,
-        "/home/alice/.local/share/applications/com.t3tools.T3Code.Development.desktop",
+        "/home/alice/.local/share/applications/io.github.vaporwavie.Rosewood.Development.desktop",
       );
       assert.deepEqual(unpackaged.commands, []);
     });
@@ -353,7 +353,8 @@ describe("DesktopLinuxUrlHandler", () => {
           module: "FileSystem",
           method: "writeFileString",
           description: "read-only filesystem",
-          pathOrDescriptor: "/home/alice/.local/share/applications/com.t3tools.T3Code.desktop",
+          pathOrDescriptor:
+            "/home/alice/.local/share/applications/io.github.vaporwavie.Rosewood.desktop",
         }),
       });
 
@@ -536,7 +537,7 @@ const themeIconFixture = (source: Uint8Array) =>
   Effect.gen(function* () {
     const fileSystem = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
-    const root = yield* fileSystem.makeTempDirectoryScoped({ prefix: "t3-theme-icons-" });
+    const root = yield* fileSystem.makeTempDirectoryScoped({ prefix: "rosewood-theme-icons-" });
     yield* fileSystem.makeDirectory(path.join(root, "resources", "icons"), { recursive: true });
     yield* fileSystem.writeFile(path.join(root, "resources", "icons", "256x256.png"), source);
     const hicolorDir = path.join(root, "icons", "hicolor");
@@ -568,17 +569,17 @@ it.layer(NodeServices.layer)("DesktopLinuxUrlHandler theme icons", (it) => {
 
       yield* registerWithRealFileSystem(run);
       assert.deepEqual([...(yield* fileSystem.readDirectory(fixture.appsDir))].sort(), [
-        "com.t3tools.T3Code.png",
-        "com.t3tools.t3code.png",
+        "io.github.vaporwavie.Rosewood.png",
+        "io.github.vaporwavie.rosewood.png",
       ]);
-      for (const name of ["com.t3tools.t3code", "com.t3tools.T3Code"]) {
+      for (const name of ["io.github.vaporwavie.rosewood", "io.github.vaporwavie.Rosewood"]) {
         const target = path.join(fixture.appsDir, `${name}.png`);
         assert.deepEqual([...(yield* fileSystem.readFile(target))], [...icon]);
         yield* fileSystem.utimes(target, fixture.pastSeconds, fixture.pastSeconds);
       }
 
       yield* registerWithRealFileSystem(run);
-      for (const name of ["com.t3tools.t3code", "com.t3tools.T3Code"]) {
+      for (const name of ["io.github.vaporwavie.rosewood", "io.github.vaporwavie.Rosewood"]) {
         const info = yield* fileSystem.stat(path.join(fixture.appsDir, `${name}.png`));
         assert.equal(Option.getOrThrow(info.mtime).getTime(), fixture.pastSeconds * 1000);
       }
@@ -593,8 +594,8 @@ it.layer(NodeServices.layer)("DesktopLinuxUrlHandler theme icons", (it) => {
       const path = yield* Path.Path;
       const fixture = yield* themeIconFixture(new Uint8Array([1, 2, 3]));
       yield* fixture.seedCache;
-      const lower = path.join(fixture.appsDir, "com.t3tools.t3code.png");
-      const upper = path.join(fixture.appsDir, "com.t3tools.T3Code.png");
+      const lower = path.join(fixture.appsDir, "io.github.vaporwavie.rosewood.png");
+      const upper = path.join(fixture.appsDir, "io.github.vaporwavie.Rosewood.png");
       yield* fileSystem.writeFile(lower, new Uint8Array([3, 2, 1]));
       yield* fileSystem.writeFile(upper, new Uint8Array([1, 2, 3]));
       for (const target of [lower, upper]) {
@@ -635,7 +636,9 @@ it.layer(NodeServices.layer)("DesktopLinuxUrlHandler theme icons", (it) => {
 
       yield* registerWithRealFileSystem(run);
 
-      assert.isTrue(yield* fileSystem.exists(path.join(fixture.appsDir, "com.t3tools.T3Code.png")));
+      assert.isTrue(
+        yield* fileSystem.exists(path.join(fixture.appsDir, "io.github.vaporwavie.Rosewood.png")),
+      );
       assert.equal(iconCacheRuns(run), 1);
     }).pipe(Effect.scoped),
   );

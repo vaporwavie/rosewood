@@ -1,8 +1,8 @@
-import type { ScopedThreadRef } from "@t3tools/contracts";
-import { isWindowsAbsolutePath, normalizeProjectPathForComparison } from "@t3tools/shared/path";
+import type { ScopedThreadRef } from "@rosewood/contracts";
+import { isWindowsAbsolutePath, normalizeProjectPathForComparison } from "@rosewood/shared/path";
 
 import { useRightPanelStore } from "./rightPanelStore";
-import { resolvePathLinkTarget } from "@t3tools/shared/fileLinks";
+import { resolvePathLinkTarget } from "@rosewood/shared/fileLinks";
 
 interface OpenDiffFilePrimaryActionInput {
   readonly threadRef: ScopedThreadRef | null;

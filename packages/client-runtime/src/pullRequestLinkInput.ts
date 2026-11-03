@@ -1,5 +1,5 @@
-import type { RepositoryIdentity } from "@t3tools/contracts";
-import { canonicalizeGitCafePullRequestUrl } from "@t3tools/source-control-definitions/registry";
+import type { RepositoryIdentity } from "@rosewood/contracts";
+import { canonicalizeGitCafePullRequestUrl } from "@rosewood/source-control-definitions/registry";
 
 import { sourceControlClients, type ChangeRequestTerminology } from "./sourceControlClients.ts";
 

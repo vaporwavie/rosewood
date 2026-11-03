@@ -1,5 +1,5 @@
 // Start an isolated dev server and pair its Browser panel before calling this.
-// callPreview dispatches names to T3 preview_* tools; it must keep one owned tab.
+// callPreview dispatches names to Rosewood preview_* tools; it must keep one owned tab.
 export async function setup(driver, { width, theme, mode, shellPath, projectName = "server" }) {
   const { call, evaluate } = driver;
   await call("resize", { mode: "freeform", width, height: 900 });
@@ -9,8 +9,8 @@ export async function setup(driver, { width, theme, mode, shellPath, projectName
     capture.freezeClock();
     const settings=await import('/src/hooks/useSettings.ts');
     await settings.updateClientSettings({fontSizeTerminal:12});
-    localStorage.setItem('t3code:theme',${JSON.stringify(theme)});
-    window.dispatchEvent(new StorageEvent('storage',{key:'t3code:theme',newValue:${JSON.stringify(theme)}}));
+    localStorage.setItem('rosewood:theme',${JSON.stringify(theme)});
+    window.dispatchEvent(new StorageEvent('storage',{key:'rosewood:theme',newValue:${JSON.stringify(theme)}}));
   })()`);
   await call("click", {
     locator: `button[aria-label=${JSON.stringify(`New thread in ${projectName}`)}]`,
@@ -18,7 +18,7 @@ export async function setup(driver, { width, theme, mode, shellPath, projectName
   await call("wait_for", { locator: '[role="textbox"][contenteditable="true"]' });
   const context = await evaluate(`(()=>{
     const draftId=location.pathname.split('/').at(-1);
-    const draft=JSON.parse(localStorage['t3code:composer-drafts:v1']).state.draftThreadsByThreadKey[draftId];
+    const draft=JSON.parse(localStorage['rosewood:composer-drafts:v1']).state.draftThreadsByThreadKey[draftId];
     if(!draft) throw Error('Expected a newly created draft');
     const threadRef={environmentId:draft.environmentId,threadId:draft.threadId};
     return {route:location.pathname,threadRef,threadKey:draft.environmentId+':'+draft.threadId};

@@ -9,9 +9,9 @@ import type {
   Todo as OpenCodeTodo,
   ToolPart,
 } from "@opencode-ai/sdk/v2";
-import * as HostProcess from "@t3tools/shared/HostProcess";
-import { getModelSelectionStringOptionValue } from "@t3tools/shared/model";
-import { causeErrorTag } from "@t3tools/shared/observability";
+import * as HostProcess from "@rosewood/shared/HostProcess";
+import { getModelSelectionStringOptionValue } from "@rosewood/shared/model";
+import { causeErrorTag } from "@rosewood/shared/observability";
 import {
   defaultInstanceIdForDriver,
   type ModelSelection,
@@ -35,7 +35,7 @@ import {
   type ProviderSessionId,
   type RuntimeRequestId,
   type ThreadId,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { OpenCodeSettings } from "../settings.ts";
 import * as Cause from "effect/Cause";
 import * as DateTime from "effect/DateTime";
@@ -53,33 +53,33 @@ import * as Semaphore from "effect/Semaphore";
 import * as Scope from "effect/Scope";
 import * as Stream from "effect/Stream";
 
-import * as ProviderHost from "@t3tools/provider-core/server/ProviderHost";
-import { mcpToolPresentation } from "@t3tools/provider-core/server/mcpToolPresentation";
-import * as McpProviderSessions from "@t3tools/provider-core/server/McpProviderSessions";
-import * as ProviderEventLoggers from "@t3tools/provider-core/server/ProviderEventLoggers";
+import * as ProviderHost from "@rosewood/provider-core/server/ProviderHost";
+import { mcpToolPresentation } from "@rosewood/provider-core/server/mcpToolPresentation";
+import * as McpProviderSessions from "@rosewood/provider-core/server/McpProviderSessions";
+import * as ProviderEventLoggers from "@rosewood/provider-core/server/ProviderEventLoggers";
 import {
   structuralProtocolMethod,
   summarizeNativeProtocolPayload,
-} from "@t3tools/provider-core/server/nativeProtocolLogging";
-import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/instanceEnvironment";
-import { t3OrchestrationSystemPrompt } from "@t3tools/provider-core/server/orchestrationInstructions";
-import { buildRuntimeInstructions } from "@t3tools/provider-core/server/runtimeInstructions";
+} from "@rosewood/provider-core/server/nativeProtocolLogging";
+import { mergeProviderInstanceEnvironment } from "@rosewood/provider-core/server/instanceEnvironment";
+import { rosewoodOrchestrationSystemPrompt } from "@rosewood/provider-core/server/orchestrationInstructions";
+import { buildRuntimeInstructions } from "@rosewood/provider-core/server/runtimeInstructions";
 import * as OpenCodeRuntime from "./OpenCodeRuntime.ts";
 import { readableProviderErrorMessage } from "./providerErrorMessage.ts";
-import * as IdAllocator from "@t3tools/provider-core/server/IdAllocator";
-import { makeProviderFailure } from "@t3tools/provider-core/server/failure";
-import { turnScopedSelectionTransition } from "@t3tools/provider-core/server/selectionTransition";
-import { providerMessageTextWithAttachmentPaths } from "@t3tools/provider-core/server/attachmentPrompt";
-import * as ProviderAdapter from "@t3tools/provider-core/server/ProviderAdapter";
+import * as IdAllocator from "@rosewood/provider-core/server/IdAllocator";
+import { makeProviderFailure } from "@rosewood/provider-core/server/failure";
+import { turnScopedSelectionTransition } from "@rosewood/provider-core/server/selectionTransition";
+import { providerMessageTextWithAttachmentPaths } from "@rosewood/provider-core/server/attachmentPrompt";
+import * as ProviderAdapter from "@rosewood/provider-core/server/ProviderAdapter";
 import {
   ProviderAdapterDriverCreateError,
   type ProviderAdapterDriver,
   type ProviderAdapterDriverCreateInput,
-} from "@t3tools/provider-core/server/adapterDriver";
+} from "@rosewood/provider-core/server/adapterDriver";
 import {
   makeSubagentChildThread,
   subagentThreadTitle,
-} from "@t3tools/provider-core/server/subagentProjection";
+} from "@rosewood/provider-core/server/subagentProjection";
 import { openCodeToolTurnItem } from "./toolItems.ts";
 
 export const OPENCODE_PROVIDER = ProviderDriverKind.make("opencode");
@@ -958,15 +958,15 @@ export const makeOpenCodeAdapterV2 = Effect.fn("makeOpenCodeAdapterV2")(function
         });
 
         const mcpSession = yield* mcpSessions.read(input.threadId);
-        const hasT3Mcp = mcpSession !== undefined && !connection.external;
-        const orchestrationSystemPrompt = t3OrchestrationSystemPrompt(
-          hasT3Mcp,
+        const hasRosewoodMcp = mcpSession !== undefined && !connection.external;
+        const orchestrationSystemPrompt = rosewoodOrchestrationSystemPrompt(
+          hasRosewoodMcp,
           mcpSession?.capabilities?.has("device") === true,
         );
-        if (hasT3Mcp) {
+        if (hasRosewoodMcp) {
           yield* OpenCodeRuntime.runOpenCodeSdk("mcp.add", () =>
             client.mcp.add({
-              name: "t3-code",
+              name: "rosewood",
               config: {
                 type: "remote",
                 url: mcpSession.endpoint,

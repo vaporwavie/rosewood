@@ -1,6 +1,6 @@
-import { SourceControlProviderKind } from "@t3tools/contracts";
+import { SourceControlProviderKind } from "@rosewood/contracts";
 import { describe, expect, it } from "vite-plus/test";
-import { EnvironmentId, ProjectId } from "@t3tools/contracts";
+import { EnvironmentId, ProjectId } from "@rosewood/contracts";
 
 import {
   findExistingAddProject,
@@ -25,11 +25,11 @@ describe("add project shared logic", () => {
     );
 
     for (const input of [
-      "pingdotgg/t3code",
+      "vaporwavie/rosewood",
       "mona-cat_octo/repo",
       "pingdotgg",
-      "https://github.com/pingdotgg/t3code.git",
-      "git@github.com:pingdotgg/t3code.git",
+      "https://github.com/vaporwavie/rosewood.git",
+      "git@github.com:vaporwavie/rosewood.git",
     ]) {
       expect(githubIncompleteOwnerRepositoryMessage(github, input)).toBeNull();
     }
@@ -46,8 +46,8 @@ describe("add project shared logic", () => {
     expect(normalizePastedCloneUrl("imputnet/helium")).toBe(
       "https://github.com/imputnet/helium.git",
     );
-    expect(normalizePastedCloneUrl("  pingdotgg/t3code  ")).toBe(
-      "https://github.com/pingdotgg/t3code.git",
+    expect(normalizePastedCloneUrl("  vaporwavie/rosewood  ")).toBe(
+      "https://github.com/vaporwavie/rosewood.git",
     );
   });
 

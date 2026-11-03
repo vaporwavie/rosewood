@@ -6,7 +6,7 @@ import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Schema from "effect/Schema";
 import * as SqlError from "effect/sql/SqlError";
-import { DEFAULT_MANAGED_TUNNEL_LIMIT, T3CHAT_PLAN_TUNNEL_LIMITS } from "@t3tools/contracts/relay";
+import { DEFAULT_MANAGED_TUNNEL_LIMIT, T3CHAT_PLAN_TUNNEL_LIMITS } from "@rosewood/contracts/relay";
 
 import * as RelayDb from "../db.ts";
 import {
@@ -111,15 +111,15 @@ export class ManagedTunnelLimits extends Context.Service<
       readonly userId: string;
     }) => Effect.Effect<number | null, ManagedTunnelLimitPersistenceError>;
   }
->()("t3code-relay/environments/ManagedTunnelLimits") {}
+>()("rosewood-relay/environments/ManagedTunnelLimits") {}
 
 const make = Effect.gen(function* () {
   const db = yield* RelayDb.RelayDb;
-  const t3Chat = yield* T3ChatAccounts.T3ChatAccounts;
+  const rosewoodChat = yield* T3ChatAccounts.T3ChatAccounts;
 
   // Asked only at the cap, so most links never call T3 Chat. Any failure keeps the lower cap.
-  const t3ChatTunnelLimit = (userId: string) =>
-    t3Chat.getLink({ userId }).pipe(
+  const rosewoodChatTunnelLimit = (userId: string) =>
+    rosewoodChat.getLink({ userId }).pipe(
       Effect.map((link) =>
         link && link.plan !== "free" ? T3CHAT_PLAN_TUNNEL_LIMITS[link.plan] : 0,
       ),
@@ -203,8 +203,8 @@ const make = Effect.gen(function* () {
         // A manual override is the exact cap; a T3 Chat plan raises only the default.
         // Runs under the user lock, bounded by the T3 Chat request timeout.
         const maxTunnels =
-          t3Chat.available && override === null
-            ? Math.max(baseMaxTunnels, yield* t3ChatTunnelLimit(input.userId))
+          rosewoodChat.available && override === null
+            ? Math.max(baseMaxTunnels, yield* rosewoodChatTunnelLimit(input.userId))
             : baseMaxTunnels;
         if (activeTunnels >= maxTunnels) {
           return yield* new ManagedTunnelLimitExceeded({

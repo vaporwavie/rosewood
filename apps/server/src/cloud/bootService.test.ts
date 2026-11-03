@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { expect, it } from "@effect/vitest";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import * as ConfigProvider from "effect/ConfigProvider";
 import * as Duration from "effect/Duration";
 import * as Effect from "effect/Effect";
@@ -21,22 +21,24 @@ import {
   serviceStateHasPendingUpdate,
 } from "./serviceProtocol.ts";
 
-it("reads the served T3 home back out of a rendered unit or plist", () => {
+it("reads the served Rosewood home back out of a rendered unit or plist", () => {
   const plan = (baseDir: string) => ({
-    program: [`${baseDir}/runtime/versions/1.2.3/t3`, "__service-launcher"],
+    program: [`${baseDir}/runtime/versions/1.2.3/rosewood`, "__service-launcher"],
     baseDir,
     logPath: `${baseDir}/userdata/logs/boot-service.log`,
-    unitPath: "/home/theo/.config/systemd/user/t3code.service",
+    unitPath: "/home/theo/.config/systemd/user/rosewood.service",
   });
 
   expect(
-    BootService.bootServiceBaseDirOf(BootService.renderBootServiceUnit(plan("/home/theo/.t3"))),
-  ).toBe("/home/theo/.t3");
+    BootService.bootServiceBaseDirOf(
+      BootService.renderBootServiceUnit(plan("/home/theo/.rosewood")),
+    ),
+  ).toBe("/home/theo/.rosewood");
   expect(
     BootService.bootServiceBaseDirOf(
-      BootService.renderBootServiceUnit(plan("/home/theo/T3 Data/100%")),
+      BootService.renderBootServiceUnit(plan("/home/theo/Rosewood Data/100%")),
     ),
-  ).toBe("/home/theo/T3 Data/100%");
+  ).toBe("/home/theo/Rosewood Data/100%");
   expect(
     BootService.bootServiceBaseDirOf(
       BootService.renderBootServicePlist(plan("/Users/theo/a&b"), {
@@ -50,10 +52,10 @@ it("reads the served T3 home back out of a rendered unit or plist", () => {
 
 it("protects the server unit from agents under CPU and memory pressure", () => {
   const unit = BootService.renderBootServiceUnit({
-    program: ["/home/theo/.t3/runtime/versions/1.2.3/t3", "__service-launcher"],
-    baseDir: "/home/theo/.t3",
-    logPath: "/home/theo/.t3/userdata/logs/boot-service.log",
-    unitPath: "/home/theo/.config/systemd/user/t3code.service",
+    program: ["/home/theo/.rosewood/runtime/versions/1.2.3/rosewood", "__service-launcher"],
+    baseDir: "/home/theo/.rosewood",
+    logPath: "/home/theo/.rosewood/userdata/logs/boot-service.log",
+    unitPath: "/home/theo/.config/systemd/user/rosewood.service",
   });
   const service = unit.slice(unit.indexOf("[Service]"), unit.indexOf("[Install]"));
   for (const line of [
@@ -68,7 +70,7 @@ it("protects the server unit from agents under CPU and memory pressure", () => {
 });
 
 it.each([
-  ["a unit", '/home/theo/T3 "Data"/100%\\x', BootService.renderBootServiceUnit],
+  ["a unit", '/home/theo/Rosewood "Data"/100%\\x', BootService.renderBootServiceUnit],
   [
     "a plist",
     "/Users/theo/a&b <c>",
@@ -76,7 +78,7 @@ it.each([
       BootService.renderBootServicePlist(plan, { homeDir: "/Users/theo", environmentPath: "" }),
   ],
 ] as const)("reads the launcher back out of %s", (_, baseDir, render) => {
-  const program = `${baseDir}/runtime/versions/1.2.3/t3`;
+  const program = `${baseDir}/runtime/versions/1.2.3/rosewood`;
   expect(
     BootService.bootServiceProgramOf(
       render({ program: [program, "__service-launcher"], baseDir, logPath: "/log", unitPath: "" }),
@@ -95,7 +97,7 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
 ) {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
-  const home = yield* fs.makeTempDirectoryScoped({ prefix: "t3-boot-service-test-" });
+  const home = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-boot-service-test-" });
   const managerUnitDir = path.join(
     managerXdgConfigHome !== undefined && path.isAbsolute(managerXdgConfigHome)
       ? managerXdgConfigHome
@@ -103,7 +105,7 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
     "systemd",
     "user",
   );
-  const baseDir = path.join(home, ".t3");
+  const baseDir = path.join(home, ".rosewood");
   const statePath = path.join(baseDir, "runtime", "service-state.json");
   const runtime = pinnedRuntimePaths(path, baseDir, "1.2.3", platform);
   yield* fs.makeDirectory(path.dirname(runtime.entryPath), { recursive: true });
@@ -136,13 +138,13 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
       const failed = command === control.failCommand;
       if (!failed && command === "loginctl enable-linger --no-ask-password 501")
         control.linger = "yes";
-      if (!failed && command === "systemctl --user enable t3code.service") control.enabled = true;
-      if (!failed && command === "systemctl --user restart t3code.service") control.active = true;
+      if (!failed && command === "systemctl --user enable rosewood.service") control.enabled = true;
+      if (!failed && command === "systemctl --user restart rosewood.service") control.active = true;
       // A timed-out stop may still stop the service.
-      if (command === "systemctl --user stop t3code.service") control.active = false;
+      if (command === "systemctl --user stop rosewood.service") control.active = false;
       if (
         control.stateAfterStop !== undefined &&
-        (command === "systemctl --user stop t3code.service" ||
+        (command === "systemctl --user stop rosewood.service" ||
           command.startsWith("launchctl bootout --wait "))
       ) {
         yield* fs.writeFileString(statePath, control.stateAfterStop).pipe(Effect.orDie);
@@ -161,7 +163,7 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
                 ],
               })
             : input.args[0] === "--version"
-              ? `t3 v${/versions\/([^/]+)\//.exec(input.command)?.[1] ?? "1.2.3"}\n`
+              ? `rosewood v${/versions\/([^/]+)\//.exec(input.command)?.[1] ?? "1.2.3"}\n`
               : input.command === "loginctl" && input.args[0] === "show-user"
                 ? `${control.linger}\n`
                 : input.args[1] === "is-enabled"
@@ -190,7 +192,7 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
     cliVersion = "1.2.3",
     serviceBaseDir = baseDir,
     insideService = false,
-    hostExecPath = "/usr/bin/t3",
+    hostExecPath = "/usr/bin/rosewood",
   ) =>
     Effect.gen(function* () {
       const paths = pinnedRuntimePaths(path, serviceBaseDir, cliVersion, platform);
@@ -222,7 +224,7 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
                 ...(environmentPath === undefined || environmentPath === ""
                   ? {}
                   : { PATH: environmentPath }),
-                ...(insideService ? { T3_BOOT_SERVICE_UNIT: "t3code.service" } : {}),
+                ...(insideService ? { ROSEWOOD_BOOT_SERVICE_UNIT: "rosewood.service" } : {}),
               },
             }),
           ),
@@ -297,7 +299,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
         );
         expect(yield* fs.readFileString(statePath)).toBe(before);
         expect(yield* fs.readFileString(plan.unitPath)).toBe(unit);
-        expect(commands).not.toContain("systemctl --user stop t3code.service");
+        expect(commands).not.toContain("systemctl --user stop rosewood.service");
       }),
   );
 
@@ -349,7 +351,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
     Effect.gen(function* () {
       const path = yield* Path.Path;
       const fs = yield* FileSystem.FileSystem;
-      const configRoot = yield* fs.makeTempDirectoryScoped({ prefix: "t3-xdg-config-" });
+      const configRoot = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-xdg-config-" });
       const xdgConfigHome = {
         unset: undefined,
         empty: "",
@@ -373,7 +375,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
           : path.join(home, ".config"),
         "systemd",
         "user",
-        "t3code.service",
+        "rosewood.service",
       );
       expect(yield* service.status).toMatchObject({ installed: false, unitPath });
       const plan = yield* service.install();
@@ -419,7 +421,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
       expect(yield* fs.exists(unitPath)).toBe(false);
       expect((yield* discoveredService.status).installed).toBe(false);
       // systemd can take 90s to stop, exceeding the runner's 60s default.
-      expect(timeouts.get("systemctl --user disable --now t3code.service")).toEqual(
+      expect(timeouts.get("systemctl --user disable --now rosewood.service")).toEqual(
         Duration.seconds(120),
       );
     }),
@@ -492,9 +494,12 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
           ),
         ).toEqual(
           platform === "linux"
-            ? ["systemctl --user stop t3code.service", "systemctl --user restart t3code.service"]
+            ? [
+                "systemctl --user stop rosewood.service",
+                "systemctl --user restart rosewood.service",
+              ]
             : [
-                "launchctl bootout --wait gui/501/com.t3tools.t3code.service",
+                "launchctl bootout --wait gui/501/io.github.vaporwavie.rosewood.service",
                 `launchctl bootstrap gui/501 ${plan.unitPath}`,
               ],
         );
@@ -542,7 +547,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
         const path = yield* Path.Path;
         const envPath = path.join(baseDir, SERVICE_ENV_FILE);
         const envBytes = new TextEncoder().encode(
-          '# user configuration\r\nT3CODE_TOKEN="literal $HOME # token"',
+          '# user configuration\r\nROSEWOOD_TOKEN="literal $HOME # token"',
         );
         yield* fs.writeFile(envPath, envBytes);
         yield* service.install();
@@ -559,7 +564,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
           protocol: SERVICE_LAUNCHER_PROTOCOL,
           activeVersion: "1.2.4",
         });
-        expect(yield* fs.readFileString(plan.unitPath)).toContain("versions/1.2.4/t3");
+        expect(yield* fs.readFileString(plan.unitPath)).toContain("versions/1.2.4/rosewood");
         expect(
           commands.filter(
             (command) =>
@@ -631,7 +636,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
       expect(failure).toBe("repair failed");
       expect(control.active).toBe(true);
 
-      control.failCommand = "systemctl --user stop t3code.service";
+      control.failCommand = "systemctl --user stop rosewood.service";
       let ran = false;
       const stopFailure = yield* service
         .withStopped(
@@ -652,11 +657,11 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
       commands.length = 0;
       yield* service.withStopped(Effect.sync(() => commands.push("repair")));
       expect(commands).toEqual([
-        "systemctl --user is-enabled t3code.service",
-        "systemctl --user is-active t3code.service",
-        "systemctl --user stop t3code.service",
+        "systemctl --user is-enabled rosewood.service",
+        "systemctl --user is-active rosewood.service",
+        "systemctl --user stop rosewood.service",
         "repair",
-        "systemctl --user restart t3code.service",
+        "systemctl --user restart rosewood.service",
       ]);
       expect(control.active).toBe(true);
       control.enabled = false;
@@ -666,14 +671,14 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
       control.enabled = false;
       commands.length = 0;
       yield* service.withStopped(Effect.sync(() => commands.push("repair")));
-      expect(commands).toContain("systemctl --user stop t3code.service");
-      expect(commands).not.toContain("systemctl --user restart t3code.service");
+      expect(commands).toContain("systemctl --user stop rosewood.service");
+      expect(commands).not.toContain("systemctl --user restart rosewood.service");
       expect(control.active).toBe(false);
       control.enabled = true;
       control.active = true;
 
       const fs = yield* FileSystem.FileSystem;
-      const otherHome = yield* fs.makeTempDirectoryScoped({ prefix: "t3-doctor-other-" });
+      const otherHome = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-doctor-other-" });
       const other = yield* makeService(undefined, "1.2.3", otherHome);
       commands.length = 0;
       expect(yield* other.withStopped(Effect.sync(() => control.active))).toBe(true);
@@ -681,15 +686,15 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
     }),
   );
 
-  it.effect("restart leaves a service that serves another T3 home alone", () =>
+  it.effect("restart leaves a service that serves another Rosewood home alone", () =>
     Effect.gen(function* () {
       const { service, fs, commands, makeService } = yield* makeHarness();
       yield* service.install();
       commands.length = 0;
       const path = yield* Path.Path;
-      const otherHome = yield* fs.makeTempDirectoryScoped({ prefix: "t3-other-home-" });
+      const otherHome = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-other-home-" });
 
-      const other = yield* makeService(undefined, "1.2.3", path.join(otherHome, ".t3"));
+      const other = yield* makeService(undefined, "1.2.3", path.join(otherHome, ".rosewood"));
       expect(yield* other.restart).toBe("skipped");
       expect(commands.filter((command) => command.startsWith("systemctl "))).toEqual([]);
     }),
@@ -699,8 +704,8 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
     Effect.gen(function* () {
       const { fs, commands, invocations, control, makeService } = yield* makeHarness();
       const path = yield* Path.Path;
-      const home = yield* fs.makeTempDirectoryScoped({ prefix: "t3-handoff-" });
-      const baseDir = path.join(home, "T3 Data 100%", "${UNSET}", "$literal");
+      const home = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-handoff-" });
+      const baseDir = path.join(home, "Rosewood Data 100%", "${UNSET}", "$literal");
       const outside = yield* makeService(undefined, "1.2.3", baseDir);
       const plan = yield* outside.install();
       const statePath = path.join(baseDir, "runtime", "service-state.json");
@@ -714,7 +719,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
 
       expect(yield* fs.readFileString(statePath)).toBe(state);
       expect(yield* fs.readFileString(plan.unitPath)).toBe(unit);
-      expect(commands).not.toContain("systemctl --user stop t3code.service");
+      expect(commands).not.toContain("systemctl --user stop rosewood.service");
       expect(result).toMatchObject({ handedOff: true, logPath: plan.logPath });
       const handoffs = invocations.filter(({ command }) => command === "systemd-run");
       expect(handoffs).toHaveLength(1);
@@ -724,12 +729,12 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
         "--quiet",
         `--property=StandardOutput=append:${plan.logPath}`,
         `--property=StandardError=append:${plan.logPath}`,
-        "--setenv=T3_BOOT_SERVICE_UNIT=",
+        "--setenv=ROSEWOOD_BOOT_SERVICE_UNIT=",
         pinnedRuntimePaths(path, baseDir, "1.2.4", "linux").entryPath,
         "service",
         "install",
         "--base-dir",
-        path.join(home, "T3 Data 100%", "$${UNSET}", "$$literal"),
+        path.join(home, "Rosewood Data 100%", "$${UNSET}", "$$literal"),
         "--allow-downgrade",
       ]);
 
@@ -740,7 +745,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
       expect(yield* fs.readFileString(statePath)).toBe(state);
       expect(yield* fs.readFileString(plan.unitPath)).toBe(unit);
       expect(control.active).toBe(true);
-      expect(commands).not.toContain("systemctl --user stop t3code.service");
+      expect(commands).not.toContain("systemctl --user stop rosewood.service");
     }),
   );
 
@@ -767,8 +772,8 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
         const outcome = yield* inside.restart;
         expect(commands).toEqual([
           "systemctl --user daemon-reload",
-          "systemctl --user enable t3code.service",
-          "systemctl --user restart --no-block t3code.service",
+          "systemctl --user enable rosewood.service",
+          "systemctl --user restart --no-block rosewood.service",
         ]);
         expect(outcome).toBe("queued");
         expect(yield* fs.readFileString(statePath)).toBe(state);
@@ -790,9 +795,9 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
           (command) => command.startsWith("systemctl ") && !command.includes("show-environment"),
         ),
       ).toEqual([
-        "systemctl --user stop t3code.service",
+        "systemctl --user stop rosewood.service",
         "systemctl --user daemon-reload",
-        "systemctl --user restart t3code.service",
+        "systemctl --user restart rosewood.service",
       ]);
     }),
   );
@@ -824,8 +829,8 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
             (command) => command.startsWith("systemctl ") && !command.includes("show-environment"),
           ),
         ).toEqual([
-          "systemctl --user stop t3code.service",
-          "systemctl --user restart t3code.service",
+          "systemctl --user stop rosewood.service",
+          "systemctl --user restart rosewood.service",
         ]);
       }
     }),
@@ -839,7 +844,7 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
 
       expect(
         plan.unitPath.endsWith(
-          path.join("Library", "LaunchAgents", "com.t3tools.t3code.service.plist"),
+          path.join("Library", "LaunchAgents", "io.github.vaporwavie.rosewood.service.plist"),
         ),
       ).toBe(true);
       expect(yield* fs.readFileString(plan.unitPath)).toContain(
@@ -860,9 +865,9 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
       expect((yield* service.status).installed).toBe(false);
       expect(commands.some((command) => command.startsWith("systemctl "))).toBe(false);
       // launchd can take 90s to bootout; the runner's 60s default could let bootstrap race it.
-      expect(timeouts.get("launchctl bootout --wait gui/501/com.t3tools.t3code.service")).toEqual(
-        Duration.seconds(120),
-      );
+      expect(
+        timeouts.get("launchctl bootout --wait gui/501/io.github.vaporwavie.rosewood.service"),
+      ).toEqual(Duration.seconds(120));
     }),
   );
 
@@ -945,7 +950,8 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
     Effect.gen(function* () {
       const { service, control } = yield* makeHarness("darwin");
       yield* service.install();
-      control.failCommand = "launchctl bootout --wait gui/501/com.t3tools.t3code.service";
+      control.failCommand =
+        "launchctl bootout --wait gui/501/io.github.vaporwavie.rosewood.service";
 
       yield* service.install();
       expect((yield* service.status).current).toBe(true);

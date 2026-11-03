@@ -1,10 +1,10 @@
-import type { UsageTokenTotals } from "@t3tools/contracts";
+import type { UsageTokenTotals } from "@rosewood/contracts";
 import {
   isModelCostUnknown,
   type CategoryCost,
   type ModelTotals,
   type SpeedCost,
-} from "@t3tools/shared/usageMerge";
+} from "@rosewood/shared/usageMerge";
 
 import type { ShareSegment } from "./UsageShareBar";
 

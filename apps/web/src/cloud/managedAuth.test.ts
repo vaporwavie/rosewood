@@ -1,4 +1,4 @@
-import { managedRelaySessionAtom } from "@t3tools/client-runtime/relay";
+import { managedRelaySessionAtom } from "@rosewood/client-runtime/relay";
 import * as Effect from "effect/Effect";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 

@@ -1,12 +1,12 @@
 import {
   getPromptControlledTraits,
   getTraitSelectChange,
-} from "@t3tools/client-runtime/model-traits";
+} from "@rosewood/client-runtime/model-traits";
 import type {
   ManagedPolicySummary,
   ProviderOptionDescriptor,
   RuntimeMode,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { describe, expect, it } from "vite-plus/test";
 
 import {

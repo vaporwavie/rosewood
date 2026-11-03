@@ -9,14 +9,14 @@ import { useEffect, useState } from "react";
 import { View } from "react-native";
 
 import { hasCloudPublicConfig } from "../cloud/publicConfig";
-import { T3ConnectProfilePage } from "../cloud/T3ConnectProfilePage";
+import { RosewoodConnectProfilePage } from "../cloud/RosewoodConnectProfilePage";
 
 const USER_PROFILE_CUSTOM_PAGES = [
   {
-    path: "t3-connect",
-    label: "T3 Connect",
+    path: "rosewood-connect",
+    label: "Rosewood Connect",
     icon: "globe",
-    content: <T3ConnectProfilePage />,
+    content: <RosewoodConnectProfilePage />,
   },
 ] satisfies UserProfileCustomPage[];
 
@@ -35,8 +35,8 @@ function ConfiguredSettingsAuthRouteScreen() {
   if (isSignedIn && !hasBeenSignedIn) setHasBeenSignedIn(true);
 
   // Clerk reports sign-out only through its auth store (the native profile view
-  // and the T3 Connect page can both sign out), so this follows that store.
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- pops the navigator when Clerk's auth store reports a sign-out from the profile view or Connect page
+  // and the Rosewood Connect page can both sign out), so this follows that store.
+  // oxlint-disable-next-line rosewood/no-unreasoned-state-sync -- pops the navigator when Clerk's auth store reports a sign-out from the profile view or Connect page
   useEffect(() => {
     if (hasBeenSignedIn && isLoaded && isSignedIn === false) {
       navigation.goBack();

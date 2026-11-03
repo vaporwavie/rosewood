@@ -1,0 +1,10 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["RosewoodReviewDiffModule"],
+    "podspecPath": "RosewoodReviewDiffNative.podspec"
+  },
+  "android": {
+    "modules": ["expo.modules.rosewoodreviewdiff.RosewoodReviewDiffModule"]
+  }
+}

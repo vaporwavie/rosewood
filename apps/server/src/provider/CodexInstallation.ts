@@ -3,10 +3,10 @@ import {
   ProviderDriverKind,
   type ProviderInstallState,
   type ServerProviderCompatibilityAdvisory,
-} from "@t3tools/contracts";
-import { cliArchiveTarCommand } from "@t3tools/shared/cliRelease";
-import * as HostProcess from "@t3tools/shared/HostProcess";
-import { resolveCommandPath, resolveSpawnCommand } from "@t3tools/shared/shell";
+} from "@rosewood/contracts";
+import { cliArchiveTarCommand } from "@rosewood/shared/cliRelease";
+import * as HostProcess from "@rosewood/shared/HostProcess";
+import { resolveCommandPath, resolveSpawnCommand } from "@rosewood/shared/shell";
 import * as Clock from "effect/Clock";
 import * as Cause from "effect/Cause";
 import * as Context from "effect/Context";
@@ -145,7 +145,7 @@ interface CodexInstallationService {
 export class CodexInstallation extends Context.Service<
   CodexInstallation,
   CodexInstallationService
->()("t3/provider/CodexInstallation") {
+>()("rosewood/provider/CodexInstallation") {
   static readonly layer = Layer.effect(
     CodexInstallation,
     Effect.gen(function* () {
@@ -291,7 +291,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       return executable;
     },
     Effect.mapError(
-      wrapFailure("resolve", "Codex is not installed in T3 Code. Install it to continue."),
+      wrapFailure("resolve", "Codex is not installed in Rosewood. Install it to continue."),
     ),
   );
   const acquire = Effect.fn("CodexInstallation.acquire")(function* () {

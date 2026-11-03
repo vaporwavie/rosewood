@@ -8,8 +8,8 @@ import {
   DEFAULT_SERVER_SETTINGS,
   ProviderDriverKind,
   ProviderInstanceId,
-} from "@t3tools/contracts";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+} from "@rosewood/contracts";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 
 import * as ManagedPolicy from "./ManagedPolicy.ts";
 import { disallowedDriverReason, providerHostEnvironment } from "./managedProviders.ts";
@@ -19,7 +19,7 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const dir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-managed-policy-" });
+      const dir = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-managed-policy-" });
       const file = path.join(dir, "policy.json");
       if (contents !== undefined) yield* fs.writeFileString(file, contents);
       return yield* ManagedPolicy.load(file);
@@ -38,7 +38,7 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
         JSON.stringify({
           schemaVersion: 1,
           organization: "Example Corp",
-          supportUrl: "https://it.example/t3",
+          supportUrl: "https://it.example/rosewood",
           settings: {
             "storageCleanup.logsAfterDays": { value: 30, locked: true },
             defaultRuntimeMode: { value: "approval-required", locked: false },
@@ -47,7 +47,7 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
       );
       assert.deepEqual(policy.summary, {
         organization: "Example Corp",
-        supportUrl: "https://it.example/t3",
+        supportUrl: "https://it.example/rosewood",
         lockedSettings: ["storageCleanup.logsAfterDays"],
       });
     }),
@@ -185,7 +185,7 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
         "environment",
       ]);
       // The host variable that replaces Codex's launch arguments is ignored too.
-      const host = { PATH: "/usr/bin", T3CODE_CODEX_LAUNCH_ARGS: "-c mcp_servers.x.command=sh" };
+      const host = { PATH: "/usr/bin", ROSEWOOD_CODEX_LAUNCH_ARGS: "-c mcp_servers.x.command=sh" };
       assert.deepEqual(providerHostEnvironment(policy.summary, host), { PATH: "/usr/bin" });
       assert.strictEqual(providerHostEnvironment(undefined, host), host);
     }),
@@ -204,7 +204,10 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
               driver: codex,
               environment: [
                 variable("HTTPS_PROXY", "http://mine"),
-                variable("T3CODE_CODEX_LAUNCH_ARGS", "--dangerously-bypass-approvals-and-sandbox"),
+                variable(
+                  "ROSEWOOD_CODEX_LAUNCH_ARGS",
+                  "--dangerously-bypass-approvals-and-sandbox",
+                ),
               ],
             },
           },
@@ -256,7 +259,9 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
           saved._tag === "Allowed"
             ? (saved.settings.providerInstances[codexId]?.environment ?? [])
             : [];
-        assert.isTrue(savedEnvironment.some((entry) => entry.name === "T3CODE_CODEX_LAUNCH_ARGS"));
+        assert.isTrue(
+          savedEnvironment.some((entry) => entry.name === "ROSEWOOD_CODEX_LAUNCH_ARGS"),
+        );
         // A home path setting would rewrite a locked home variable at launch, so the lock owns it.
         const claude = ProviderDriverKind.make("claudeAgent");
         const homeLocked = yield* ManagedPolicy.fromDocument("/test/policy.json", {
@@ -318,7 +323,7 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
           "config.serverUrl",
         );
         // The same override from the environment that starts the server is ignored too.
-        const host = { PATH: "/usr/bin", T3CODE_CODEX_LAUNCH_ARGS: "--yolo" };
+        const host = { PATH: "/usr/bin", ROSEWOOD_CODEX_LAUNCH_ARGS: "--yolo" };
         assert.deepEqual(providerHostEnvironment((yield* policyOn("linux")).summary, host), {
           PATH: "/usr/bin",
         });
@@ -425,14 +430,14 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
         const base = { schemaVersion: 1, organization: "Example Corp" };
         const updates = {
           mode: "auto" as const,
-          feedUrl: "https://updates.example/t3",
+          feedUrl: "https://updates.example/rosewood",
           allowNightly: false,
         };
         const policy = yield* loadFrom(JSON.stringify({ ...base, limits: { updates } }));
         const { feedUrl: _feedUrl, ...clientUpdates } = updates;
         assert.deepEqual(policy.summary?.limits, { updates: clientUpdates });
         for (const invalid of [
-          { mode: "auto", feedUrl: "http://updates.example/t3" },
+          { mode: "auto", feedUrl: "http://updates.example/rosewood" },
           { mode: "manual" },
           { mode: "sometimes" },
           { mode: "auto", pinVersion: "1.2.3" },

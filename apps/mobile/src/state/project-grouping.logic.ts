@@ -1,5 +1,5 @@
-import type { ProjectGroupingSettings } from "@t3tools/client-runtime/state/project-grouping";
-import type { SidebarProjectGroupingMode } from "@t3tools/contracts";
+import type { ProjectGroupingSettings } from "@rosewood/client-runtime/state/project-grouping";
+import type { SidebarProjectGroupingMode } from "@rosewood/contracts";
 
 import type { Preferences } from "../persistence/mobile-preferences";
 

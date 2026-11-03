@@ -1,7 +1,7 @@
-import { EnvironmentId, ProjectId } from "@t3tools/contracts";
+import { EnvironmentId, ProjectId } from "@rosewood/contracts";
 import { describe, expect, it } from "vite-plus/test";
 
-import type { EnvironmentProject } from "@t3tools/client-runtime/state/shell";
+import type { EnvironmentProject } from "@rosewood/client-runtime/state/shell";
 import type { HomeProjectScope } from "../home/homeThreadList";
 import {
   getProjectScopeSelectionTarget,
@@ -44,8 +44,8 @@ function makeProject(
 
 function makeScope(projects: ReadonlyArray<EnvironmentProject>): HomeProjectScope {
   return {
-    key: "github.com/t3tools/t3code",
-    title: "T3 Code",
+    key: "github.com/rosewood/rosewood",
+    title: "Rosewood",
     representative: projects[0]!,
     projects,
     projectRefs: projects.map((project) => ({
@@ -59,8 +59,8 @@ function makeScope(projects: ReadonlyArray<EnvironmentProject>): HomeProjectScop
 
 describe("getProjectScopeSelectionTarget", () => {
   it("prefers a connected copy of a project that spans environments", () => {
-    const mac = makeProject("t3code", "mac");
-    const server = makeProject("t3code", "server");
+    const mac = makeProject("rosewood", "mac");
+    const server = makeProject("rosewood", "server");
     const target = (connected: ReadonlyArray<string>, preferred: string | null = null) =>
       getProjectScopeSelectionTarget(
         makeScope([mac, server]),
@@ -79,47 +79,49 @@ describe("getProjectScopeSelectionTarget", () => {
 
 describe("resolveEnvironmentProjectMatch", () => {
   it("follows the same repository onto the target machine", () => {
-    const selected = makeProject("t3code", "mac", { repositoryKey: "github.com/t3tools/t3code" });
+    const selected = makeProject("rosewood", "mac", {
+      repositoryKey: "github.com/rosewood/rosewood",
+    });
     const target = [
-      makeProject("other", "server", { repositoryKey: "github.com/t3tools/other" }),
-      makeProject("t3code-clone", "server", { repositoryKey: "github.com/t3tools/t3code" }),
+      makeProject("other", "server", { repositoryKey: "github.com/rosewood/other" }),
+      makeProject("rosewood-clone", "server", { repositoryKey: "github.com/rosewood/rosewood" }),
     ];
     expect(resolveEnvironmentProjectMatch(target, selected)).toBe(target[1]);
   });
 
   it("falls back to workspace basename, then title, for unindexed projects", () => {
-    const selected = makeProject("t3code", "mac", { workspaceRoot: "/Users/me/t3code" });
+    const selected = makeProject("rosewood", "mac", { workspaceRoot: "/Users/me/rosewood" });
     const byBasename = [
       makeProject("other", "server"),
-      makeProject("srv", "server", { workspaceRoot: "/home/me/t3code" }),
+      makeProject("srv", "server", { workspaceRoot: "/home/me/rosewood" }),
     ];
     expect(resolveEnvironmentProjectMatch(byBasename, selected)).toBe(byBasename[1]);
 
     const byTitle = [
       makeProject("other", "server"),
-      makeProject("srv", "server", { title: "t3code" }),
+      makeProject("srv", "server", { title: "rosewood" }),
     ];
     expect(resolveEnvironmentProjectMatch(byTitle, selected)).toBe(byTitle[1]);
   });
 
   it("does not treat a known different repository as a basename or title match", () => {
-    const selected = makeProject("t3code", "mac", {
-      repositoryKey: "github.com/t3tools/t3code",
-      workspaceRoot: "/Users/me/t3code",
+    const selected = makeProject("rosewood", "mac", {
+      repositoryKey: "github.com/rosewood/rosewood",
+      workspaceRoot: "/Users/me/rosewood",
     });
     const fork = makeProject("fork", "server", {
-      repositoryKey: "github.com/someone/t3code",
-      title: "t3code",
-      workspaceRoot: "/home/me/t3code",
+      repositoryKey: "github.com/someone/rosewood",
+      title: "rosewood",
+      workspaceRoot: "/home/me/rosewood",
     });
-    const unindexed = makeProject("unindexed", "server", { workspaceRoot: "/srv/t3code" });
+    const unindexed = makeProject("unindexed", "server", { workspaceRoot: "/srv/rosewood" });
     expect(resolveEnvironmentProjectMatch([fork, unindexed], selected)).toBe(unindexed);
     expect(resolveEnvironmentProjectMatch([fork], selected)).toBe(fork);
   });
 });
 
 describe("resolveDraftProjectSelection", () => {
-  const projects = [makeProject("t3code"), makeProject("t3code-2")];
+  const projects = [makeProject("rosewood"), makeProject("rosewood-2")];
   const draft = { incomingShareId: undefined, pickerClosed: false };
 
   it("opens the picker instead of auto-selecting the only project", () => {
@@ -148,7 +150,7 @@ describe("resolveDraftProjectSelection", () => {
 
   it("keeps the draft when the picker closes after a choice", () => {
     expect(
-      resolveDraftProjectSelection("environment:t3code-2", projects, [makeScope(projects)], {
+      resolveDraftProjectSelection("environment:rosewood-2", projects, [makeScope(projects)], {
         ...draft,
         pickerClosed: true,
       }),

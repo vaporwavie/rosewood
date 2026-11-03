@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
-import { scopeThreadRef } from "@t3tools/client-runtime/environment";
-import { EMPTY_ENVIRONMENT_THREAD_STATE } from "@t3tools/client-runtime/state/threads";
-import { ThreadId } from "@t3tools/contracts";
+import { scopeThreadRef } from "@rosewood/client-runtime/environment";
+import { EMPTY_ENVIRONMENT_THREAD_STATE } from "@rosewood/client-runtime/state/threads";
+import { ThreadId } from "@rosewood/contracts";
 import * as DateTime from "effect/DateTime";
 import * as Option from "effect/Option";
 import { makeThreadProjectionFixture } from "./test-fixtures";

@@ -1,4 +1,4 @@
-import type { EnvironmentId } from "@t3tools/contracts";
+import type { EnvironmentId } from "@rosewood/contracts";
 import { ChevronDownIcon, GitBranchIcon } from "lucide-react";
 import { useState } from "react";
 

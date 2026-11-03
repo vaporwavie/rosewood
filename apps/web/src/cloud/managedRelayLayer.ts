@@ -1,5 +1,5 @@
-import { ManagedRelay } from "@t3tools/client-runtime/relay";
-import { RelayWebClientId } from "@t3tools/contracts/relay";
+import { ManagedRelay } from "@rosewood/client-runtime/relay";
+import { RelayWebClientId } from "@rosewood/contracts/relay";
 import * as SecureRandom from "effect/crypto/SecureRandom";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";

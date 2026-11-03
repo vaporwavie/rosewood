@@ -7,7 +7,7 @@ import {
   type OrchestrationV2DomainEvent,
   type OrchestrationV2ThreadShell,
   type OrchestrationV2ServerCommand,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { describe, expect, it } from "@effect/vitest";
 import * as SecureRandom from "effect/crypto/SecureRandom";
 import * as DateTime from "effect/DateTime";
@@ -310,7 +310,7 @@ describe("ThreadPullRequestServiceV2 reads", () => {
         };
         const child: OrchestrationV2ThreadShell = {
           ...threadShell("child-thread"),
-          branch: "t3/reply-ok",
+          branch: "rosewood/reply-ok",
           worktreePath: "/workspace/child",
           lineage: {
             rootThreadId: parent.id,

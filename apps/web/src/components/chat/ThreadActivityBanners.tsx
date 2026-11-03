@@ -3,16 +3,16 @@ import type {
   OrchestrationV2PendingBackgroundTask,
   OrchestrationV2ProviderGoal,
   ThreadId,
-} from "@t3tools/contracts";
-import type { EnvironmentThreadShell, ThreadStructure } from "@t3tools/client-runtime/state/shell";
+} from "@rosewood/contracts";
+import type { EnvironmentThreadShell, ThreadStructure } from "@rosewood/client-runtime/state/shell";
 import {
   presentPendingBackgroundWork,
   presentProviderGoal,
   type RunStopPresentation,
-} from "@t3tools/client-runtime/state/thread-execution";
-import { childThreadInputsTitle } from "@t3tools/client-runtime/state/threads";
-import { commandDisplayText } from "@t3tools/client-runtime/work-log/command-label";
-import { formatDuration } from "@t3tools/shared/orchestrationTiming";
+} from "@rosewood/client-runtime/state/thread-execution";
+import { childThreadInputsTitle } from "@rosewood/client-runtime/state/threads";
+import { commandDisplayText } from "@rosewood/client-runtime/work-log/command-label";
+import { formatDuration } from "@rosewood/shared/orchestrationTiming";
 import * as DateTime from "effect/DateTime";
 import {
   CircleDashedIcon,

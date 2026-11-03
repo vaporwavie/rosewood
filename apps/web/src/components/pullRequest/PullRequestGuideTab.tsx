@@ -1,4 +1,8 @@
-import type { EnvironmentId, PullRequestRef, PullRequestReviewGuideStop } from "@t3tools/contracts";
+import type {
+  EnvironmentId,
+  PullRequestRef,
+  PullRequestReviewGuideStop,
+} from "@rosewood/contracts";
 import { SparklesIcon, TriangleAlertIcon } from "lucide-react";
 import { useEffect, useEffectEvent } from "react";
 
@@ -78,7 +82,7 @@ export function PullRequestGuideTab({
   const guide = data?.guide ?? null;
   const tourShown = active && guide !== null;
   const reportTourShown = useEffectEvent(() => onTourShown?.());
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- tells the parent once the loaded guide tour is on screen, which data arrival can cause
+  // oxlint-disable-next-line rosewood/no-unreasoned-state-sync -- tells the parent once the loaded guide tour is on screen, which data arrival can cause
   useEffect(() => {
     if (tourShown) reportTourShown();
   }, [tourShown]);

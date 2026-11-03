@@ -1,5 +1,5 @@
-import type { EnvironmentId } from "@t3tools/contracts";
-import { decodeRelayJwt } from "@t3tools/shared/relayJwt";
+import type { EnvironmentId } from "@rosewood/contracts";
+import { decodeRelayJwt } from "@rosewood/shared/relayJwt";
 import * as Cause from "effect/Cause";
 import * as Clock from "effect/Clock";
 import * as Data from "effect/Data";
@@ -114,7 +114,7 @@ export function createManagedRelaySession(input: ManagedRelaySessionInput): Mana
         try: () => readCachedClerkToken(nowMillis),
         catch: (cause) =>
           new ManagedRelaySessionError({
-            message: "Could not obtain the T3 Connect session token.",
+            message: "Could not obtain the Rosewood Connect session token.",
             cause,
           }),
       });
@@ -171,7 +171,7 @@ function readSessionClerkToken(
       (token): token is string => Boolean(token),
       () =>
         new ManagedRelaySessionError({
-          message: "The T3 Connect session token is unavailable.",
+          message: "The Rosewood Connect session token is unavailable.",
         }),
     ),
   );
@@ -185,7 +185,7 @@ function requireSessionClerkToken(
   const session = registry.get(managedRelaySessionAtom);
   if (!session || session.accountId !== accountId) {
     return Effect.fail(
-      new ManagedRelaySessionError({ message: `Sign in to T3 Connect before ${action}.` }),
+      new ManagedRelaySessionError({ message: `Sign in to Rosewood Connect before ${action}.` }),
     );
   }
   return readSessionClerkToken(session);
@@ -235,7 +235,7 @@ function requireClerkToken(
   if (!session || session.accountId !== accountId) {
     return Effect.fail(
       new ManagedRelaySessionError({
-        message: "Sign in to T3 Connect before loading relay data.",
+        message: "Sign in to Rosewood Connect before loading relay data.",
       }),
     );
   }
@@ -253,7 +253,7 @@ function describeManagedRelayFailure(cause: Cause.Cause<unknown>): {
         ? relayProtectedErrorMessage(error.relayError)
         : error instanceof Error
           ? error.message
-          : "Could not load T3 Connect data.",
+          : "Could not load Rosewood Connect data.",
     traceId: findErrorTraceId(error),
   };
 }
@@ -279,7 +279,7 @@ const logListingFailure =
       Effect.tapCause((cause) => {
         if (Cause.hasInterruptsOnly(cause)) return Effect.void;
         const { message, traceId } = describeManagedRelayFailure(cause);
-        return Effect.logError(`[t3-cloud] Relay ${label} listing failed`).pipe(
+        return Effect.logError(`[rosewood-cloud] Relay ${label} listing failed`).pipe(
           Effect.annotateLogs({ message, traceId }),
         );
       }),
@@ -365,7 +365,7 @@ export function createManagedRelayQueryManager(
       ),
   );
 
-  const t3ChatLinkAtom = Atom.family((accountId: string) =>
+  const rosewoodChatLinkAtom = Atom.family((accountId: string) =>
     runtime
       .atom((get) =>
         Effect.gen(function* () {
@@ -391,7 +391,7 @@ export function createManagedRelayQueryManager(
   return {
     environmentsAtom,
     devicesAtom,
-    t3ChatLinkAtom,
+    rosewoodChatLinkAtom,
     refreshEnvironments(registry: AtomRegistry.AtomRegistry, accountId: string): void {
       registry.refresh(environmentsAtom(accountId));
     },
@@ -399,7 +399,7 @@ export function createManagedRelayQueryManager(
       registry.refresh(devicesAtom(accountId));
     },
     refreshT3ChatLink(registry: AtomRegistry.AtomRegistry, accountId: string): void {
-      registry.refresh(t3ChatLinkAtom(accountId));
+      registry.refresh(rosewoodChatLinkAtom(accountId));
     },
   };
 }

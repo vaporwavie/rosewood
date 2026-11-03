@@ -1,4 +1,4 @@
-import { SourceControlProviderKind } from "@t3tools/contracts";
+import { SourceControlProviderKind } from "@rosewood/contracts";
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import * as KeyValueStore from "effect/persistence/KeyValueStore";
@@ -17,26 +17,26 @@ import type {
   ProjectId,
   PullRequestReviewCapabilities,
   PullRequestReviewerCapabilities,
-} from "@t3tools/contracts";
-import { DEFAULT_SERVER_SETTINGS } from "@t3tools/contracts/settings";
-import type { ServerSettings } from "@t3tools/contracts";
+} from "@rosewood/contracts";
+import { DEFAULT_SERVER_SETTINGS } from "@rosewood/contracts/settings";
+import type { ServerSettings } from "@rosewood/contracts";
 import * as ServerSettingsService from "../serverSettings.ts";
-import { PullRequestOperationError } from "@t3tools/contracts";
+import { PullRequestOperationError } from "@rosewood/contracts";
 
 import * as ProjectService from "../project/ProjectService.ts";
 import * as SqlitePersistence from "../persistence/Sqlite.ts";
 import * as PullRequestFilesViewed from "../persistence/PullRequestFilesViewed.ts";
 import * as RepositoryIdentityResolver from "../project/RepositoryIdentityResolver.ts";
 import * as SourceControlProviderRegistry from "../sourceControl/SourceControlProviderRegistry.ts";
-import type { SourceControlProvider } from "@t3tools/source-control-core/server/SourceControlProvider";
-import { isSshRemoteUrl } from "@t3tools/shared/sourceControl";
-import * as SourceControlRateLimit from "@t3tools/source-control-core/server/SourceControlRateLimit";
-import { fakePullRequestProvider } from "@t3tools/source-control-testing/fakeSourceControlDriver";
+import type { SourceControlProvider } from "@rosewood/source-control-core/server/SourceControlProvider";
+import { isSshRemoteUrl } from "@rosewood/shared/sourceControl";
+import * as SourceControlRateLimit from "@rosewood/source-control-core/server/SourceControlRateLimit";
+import { fakePullRequestProvider } from "@rosewood/source-control-testing/fakeSourceControlDriver";
 import {
   PullRequestProviderError,
   type ProviderChangeRequest,
   type PullRequestProviderApi,
-} from "@t3tools/source-control-core/server/PullRequestProvider";
+} from "@rosewood/source-control-core/server/PullRequestProvider";
 import * as PullRequestProviderRegistry from "./PullRequestProviderRegistry.ts";
 import * as PullRequestService from "./PullRequestService.ts";
 import * as PullRequestReadCache from "./PullRequestReadCache.ts";
@@ -441,7 +441,12 @@ it.effect("reads nothing from a host with no implementation, but reports it", ()
     const listed: string[] = [];
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({ id: "p2", title: "notes", workspaceRoot: "/b" }),
         project({
           id: "p3",
@@ -467,7 +472,7 @@ it.effect("reads nothing from a host with no implementation, but reports it", ()
 
     const result = yield* service.list({ state: "open" });
 
-    assert.deepStrictEqual(listed, ["pingdotgg/t3code"]);
+    assert.deepStrictEqual(listed, ["vaporwavie/rosewood"]);
     assert.strictEqual(result.entries[0]?.provider, "github");
     assert.deepStrictEqual(
       result.providers.map((summary) => ({
@@ -533,7 +538,12 @@ it.effect("says where each repository carries on, and from nothing it has run ou
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({ id: "p2", title: "web", workspaceRoot: "/b", repository: "acme/web" }),
       ],
       providers: [
@@ -541,7 +551,7 @@ it.effect("says where each repository carries on, and from nothing it has run ou
           listChangeRequests: ({ repository }) =>
             Effect.succeed({
               items: [changeRequest(1, "2026-07-02T00:00:00Z")],
-              truncated: repository === "pingdotgg/t3code",
+              truncated: repository === "vaporwavie/rosewood",
               continues: true,
             }),
         }),
@@ -551,7 +561,7 @@ it.effect("says where each repository carries on, and from nothing it has run ou
     const result = yield* service.list({ state: "open" });
 
     assert.deepStrictEqual(result.nextCursors, {
-      "github.com pingdotgg/t3code": "2026-07-02T00:00:00Z|1|1",
+      "github.com vaporwavie/rosewood": "2026-07-02T00:00:00Z|1|1",
     });
   }),
 );
@@ -654,7 +664,12 @@ it.effect("keeps a row already sent at the boundary instant from arriving twice"
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
       ],
       providers: [
         fakePullRequestProvider(SourceControlProviderKind.make("github"), {
@@ -674,7 +689,7 @@ it.effect("keeps a row already sent at the boundary instant from arriving twice"
 
     const result = yield* service.list({
       state: "open",
-      cursors: { "github.com pingdotgg/t3code": "2026-07-02T00:00:00Z|1|7" },
+      cursors: { "github.com vaporwavie/rosewood": "2026-07-02T00:00:00Z|1|7" },
     });
 
     assert.deepStrictEqual(
@@ -682,7 +697,7 @@ it.effect("keeps a row already sent at the boundary instant from arriving twice"
       [8, 9],
     );
     assert.deepStrictEqual(result.nextCursors, {
-      "github.com pingdotgg/t3code": "2026-07-01T00:00:00Z|3|9",
+      "github.com vaporwavie/rosewood": "2026-07-01T00:00:00Z|3|9",
     });
   }),
 );
@@ -691,7 +706,12 @@ it.effect("keeps the earlier exclusions when a slice ends on the instant it bega
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
       ],
       providers: [
         fakePullRequestProvider(SourceControlProviderKind.make("github"), {
@@ -710,7 +730,7 @@ it.effect("keeps the earlier exclusions when a slice ends on the instant it bega
 
     const result = yield* service.list({
       state: "open",
-      cursors: { "github.com pingdotgg/t3code": "2026-07-02T00:00:00Z|1|6" },
+      cursors: { "github.com vaporwavie/rosewood": "2026-07-02T00:00:00Z|1|6" },
     });
 
     assert.deepStrictEqual(
@@ -718,7 +738,7 @@ it.effect("keeps the earlier exclusions when a slice ends on the instant it bega
       [7, 8],
     );
     assert.deepStrictEqual(result.nextCursors, {
-      "github.com pingdotgg/t3code": "2026-07-02T00:00:00Z|3|6,7,8",
+      "github.com vaporwavie/rosewood": "2026-07-02T00:00:00Z|3|6,7,8",
     });
   }),
 );
@@ -727,7 +747,12 @@ it.effect("calls a transient viewer failure a failed operation, not a signed-out
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
       ],
       providers: [
         fakePullRequestProvider(SourceControlProviderKind.make("github"), {
@@ -754,7 +779,12 @@ it.effect("reports an unusable host over a merely failing one", () =>
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({
           id: "p2",
           title: "on gitlab",
@@ -843,12 +873,17 @@ it.effect("reads a repository once when several worktrees share it", () =>
     let calls = 0;
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({
           id: "p2",
-          title: "t3code worktree",
+          title: "rosewood worktree",
           workspaceRoot: "/b",
-          repository: "PingDotGG/T3Code",
+          repository: "VaporWavie/Rosewood",
         }),
       ],
       providers: [
@@ -876,7 +911,12 @@ it.effect("keeps healthy repositories when one of them cannot be read", () =>
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({ id: "p2", title: "broken", workspaceRoot: "/b", repository: "pingdotgg/broken" }),
       ],
       providers: [
@@ -908,12 +948,17 @@ it.effect("offers each label once across repositories, despite one that cannot b
     const reads: Array<string> = [];
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({
           id: "p5",
-          title: "t3code worktree",
+          title: "rosewood worktree",
           workspaceRoot: "/e",
-          repository: "pingdotgg/t3code",
+          repository: "vaporwavie/rosewood",
         }),
         project({
           id: "p2",
@@ -938,7 +983,7 @@ it.effect("offers each label once across repositories, despite one that cannot b
               ? Effect.fail(requestFailed)
               : Effect.succeed({
                   items:
-                    input.repository === "pingdotgg/t3code"
+                    input.repository === "vaporwavie/rosewood"
                       ? [
                           { name: "size:XL", color: "d93f0b" },
                           { name: "bug", color: "d73a4a" },
@@ -959,7 +1004,10 @@ it.effect("offers each label once across repositories, despite one that cannot b
       result.labels.map((label) => label.name),
       ["bug", "size:XL"],
     );
-    assert.strictEqual(reads.filter((repository) => repository === "pingdotgg/t3code").length, 1);
+    assert.strictEqual(
+      reads.filter((repository) => repository === "vaporwavie/rosewood").length,
+      1,
+    );
     assert.strictEqual(result.truncated, false);
   }),
 );
@@ -969,7 +1017,12 @@ it.effect("puts the author a query names exactly ahead of those it only begins",
     const queries: Array<string | undefined> = [];
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
       ],
       providers: [
         fakePullRequestProvider(SourceControlProviderKind.make("github"), {
@@ -980,7 +1033,7 @@ it.effect("puts the author a query names exactly ahead of those it only begins",
                 { login: "theo-browne", name: null, avatarUrl: null },
                 { login: "octocat", name: "Theo", avatarUrl: null },
                 { login: "julius", name: "Julius", avatarUrl: null },
-                { login: "t3dotgg", name: "theo", avatarUrl: null },
+                { login: "rosewooddotgg", name: "theo", avatarUrl: null },
               ],
               truncated: true,
             });
@@ -994,7 +1047,7 @@ it.effect("puts the author a query names exactly ahead of those it only begins",
     assert.deepStrictEqual(queries, ["theo"]);
     assert.deepStrictEqual(
       result.authors.map((author) => author.login),
-      ["octocat", "t3dotgg", "theo-browne"],
+      ["octocat", "rosewooddotgg", "theo-browne"],
     );
     assert.strictEqual(result.truncated, true);
   }),
@@ -1550,7 +1603,12 @@ it.effect("refuses a repository that does not belong to the requested project", 
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
       ],
       providers: [fakePullRequestProvider(SourceControlProviderKind.make("github"))],
     });
@@ -2412,7 +2470,12 @@ it.effect("reads a host's repositories in one search, and files the rows back un
     const separately: string[] = [];
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({ id: "p2", title: "web", workspaceRoot: "/b", repository: "acme/web" }),
         project({
           id: "p3",
@@ -2433,7 +2496,7 @@ it.effect("reads a host's repositories in one search, and files the rows back un
             return Effect.succeed({
               items: [
                 batchedChangeRequest(1, "acme/web", "2026-07-03T00:00:00Z"),
-                batchedChangeRequest(2, "pingdotgg/t3code", "2026-07-02T00:00:00Z"),
+                batchedChangeRequest(2, "vaporwavie/rosewood", "2026-07-02T00:00:00Z"),
               ],
               truncated: false,
             });
@@ -2454,7 +2517,7 @@ it.effect("reads a host's repositories in one search, and files the rows back un
 
     const result = yield* service.list({ state: "open" });
 
-    assert.deepStrictEqual(asked, [["pingdotgg/t3code", "acme/web"]]);
+    assert.deepStrictEqual(asked, [["vaporwavie/rosewood", "acme/web"]]);
     assert.deepStrictEqual(separately, ["group/project"]);
     assert.deepStrictEqual(
       result.entries.map((entry) => [entry.projectId, entry.number]),
@@ -2470,7 +2533,12 @@ it.effect("carries every repository of a slice on from the oldest row in it", ()
   Effect.gen(function* () {
     const service = yield* makeService({
       projects: [
-        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+        project({
+          id: "p1",
+          title: "rosewood",
+          workspaceRoot: "/a",
+          repository: "vaporwavie/rosewood",
+        }),
         project({ id: "p2", title: "web", workspaceRoot: "/b", repository: "acme/web" }),
         project({ id: "p3", title: "docs", workspaceRoot: "/c", repository: "acme/docs" }),
       ],
@@ -2480,7 +2548,7 @@ it.effect("carries every repository of a slice on from the oldest row in it", ()
             Effect.succeed({
               items: [
                 batchedChangeRequest(1, "acme/web", "2026-07-03T00:00:00Z"),
-                batchedChangeRequest(2, "pingdotgg/t3code", "2026-07-02T00:00:00Z"),
+                batchedChangeRequest(2, "vaporwavie/rosewood", "2026-07-02T00:00:00Z"),
                 batchedChangeRequest(3, "acme/web", "2026-07-02T00:00:00Z"),
               ],
               truncated: true,
@@ -2494,7 +2562,7 @@ it.effect("carries every repository of a slice on from the oldest row in it", ()
 
     assert.isTrue(result.truncated);
     assert.deepStrictEqual(result.nextCursors, {
-      "github.com pingdotgg/t3code": "2026-07-02T00:00:00Z|1|2",
+      "github.com vaporwavie/rosewood": "2026-07-02T00:00:00Z|1|2",
       "github.com acme/web": "2026-07-02T00:00:00Z|2|3",
     });
   }),
@@ -4376,9 +4444,9 @@ it.effect(
         projects: [
           project({
             id: "p1",
-            title: "t3code",
+            title: "rosewood",
             workspaceRoot: "/a",
-            repository: "pingdotgg/t3code",
+            repository: "vaporwavie/rosewood",
           }),
         ],
         providers: [
@@ -4421,7 +4489,7 @@ it.effect(
           }),
         ],
       });
-      const ref = { projectId: "p1" as ProjectId, repository: "pingdotgg/t3code", number: 1 };
+      const ref = { projectId: "p1" as ProjectId, repository: "vaporwavie/rosewood", number: 1 };
 
       yield* service.diff(ref);
       yield* service.diff({ ...ref, cursor: "2" });

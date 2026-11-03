@@ -3,14 +3,15 @@ import * as NodeOS from "node:os";
 import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 
-// Run with the isolated server stopped: node seed.mjs <T3-home> <project-id>.
+// Run with the isolated server stopped: node seed.mjs <Rosewood-home> <project-id>.
 // The app creates projects/drafts normally; this adds only the named script.
 const [home, projectId] = process.argv.slice(2);
-if (!home || !projectId) throw new Error("Usage: node seed.mjs <isolated-T3-home> <project-id>");
+if (!home || !projectId)
+  throw new Error("Usage: node seed.mjs <isolated-Rosewood-home> <project-id>");
 const resolvedHome = await NodeFSP.realpath(home);
-const liveHome = await NodeFSP.realpath(NodePath.join(NodeOS.homedir(), ".t3"));
+const liveHome = await NodeFSP.realpath(NodePath.join(NodeOS.homedir(), ".rosewood"));
 if (resolvedHome === liveHome || resolvedHome.startsWith(liveHome + NodePath.sep)) {
-  throw new Error("Refusing to write live T3 state");
+  throw new Error("Refusing to write live Rosewood state");
 }
 const target = NodePath.join(resolvedHome, "userdata/settings.json");
 const settings = JSON.parse(

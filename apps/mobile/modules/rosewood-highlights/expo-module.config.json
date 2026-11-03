@@ -1,0 +1,10 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["RosewoodHighlightsModule"],
+    "podspecPath": "RosewoodHighlightsNative.podspec"
+  },
+  "android": {
+    "modules": ["expo.modules.rosewoodhighlights.RosewoodHighlightsModule"]
+  }
+}

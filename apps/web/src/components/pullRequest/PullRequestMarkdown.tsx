@@ -1,12 +1,12 @@
 import { ExternalLinkIcon, PaperclipIcon } from "lucide-react";
-import { markdownImageSourceFragment } from "@t3tools/client-runtime/markdown-images";
-import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
+import { markdownImageSourceFragment } from "@rosewood/client-runtime/markdown-images";
+import { sourceControlClients } from "@rosewood/client-runtime/source-control-clients";
 import {
   SOURCE_CONTROL_MEDIA_ASSET,
   type AssetResource,
   type EnvironmentId,
   type ScopedThreadRef,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { createContext, useContext } from "react";
 import type { PluggableList } from "unified";
 

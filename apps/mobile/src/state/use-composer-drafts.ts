@@ -19,17 +19,17 @@ import {
   type ProviderOptionSelection,
   type RuntimeMode,
   type ScopedThreadRef,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import * as Schema from "effect/Schema";
 import { useEffect } from "react";
 import { AsyncResult, Atom, type AtomRegistry } from "effect/reactivity";
 import * as Option from "effect/Option";
-import { parseScopedThreadKey, scopedThreadKey } from "@t3tools/client-runtime/environment";
+import { parseScopedThreadKey, scopedThreadKey } from "@rosewood/client-runtime/environment";
 import type {
   EnvironmentShellState,
   EnvironmentThreadShell,
-} from "@t3tools/client-runtime/state/shell";
-import { draftModelPickMatchesThread } from "@t3tools/shared/model";
+} from "@rosewood/client-runtime/state/shell";
+import { draftModelPickMatchesThread } from "@rosewood/shared/model";
 
 import { writeFileAtomically } from "../lib/atomic-file";
 import { createComposerContextHistory, referencedComposerContext } from "../lib/composerContext";
@@ -39,9 +39,9 @@ import {
   formatComposerContextReference,
   sanitizeComposerContextLabel,
   replaceComposerContextReferences,
-} from "@t3tools/shared/composerContextReferences";
-import { imageMimeType } from "@t3tools/shared/image";
-import { videoMimeType } from "@t3tools/shared/video";
+} from "@rosewood/shared/composerContextReferences";
+import { imageMimeType } from "@rosewood/shared/image";
+import { videoMimeType } from "@rosewood/shared/video";
 import { DraftComposerAttachmentSchema } from "../lib/composer-image-schema";
 import {
   composerAttachmentFileReferenceKey,
@@ -2041,7 +2041,7 @@ export function useComposerDraftSettings(draftKey: string | null): ComposerDraft
   const settings = useAtomValue(
     draftKey ? composerDraftSettingsAtom(draftKey) : EMPTY_DRAFT_SETTINGS_ATOM,
   );
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- starts loading persisted composer drafts from native storage on first use
+  // oxlint-disable-next-line rosewood/no-unreasoned-state-sync -- starts loading persisted composer drafts from native storage on first use
   useEffect(() => {
     ensureComposerDraftsLoaded();
   }, []);
@@ -2050,7 +2050,7 @@ export function useComposerDraftSettings(draftKey: string | null): ComposerDraft
 
 export function useComposerDraft(draftKey: string | null): ComposerDraft {
   const draft = useAtomValue(draftKey ? composerDraftAtom(draftKey) : EMPTY_DRAFT_ATOM);
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- starts loading persisted composer drafts from native storage on first use
+  // oxlint-disable-next-line rosewood/no-unreasoned-state-sync -- starts loading persisted composer drafts from native storage on first use
   useEffect(() => {
     ensureComposerDraftsLoaded();
   }, []);
@@ -2059,7 +2059,7 @@ export function useComposerDraft(draftKey: string | null): ComposerDraft {
 
 export function useStickyComposerModelSelection(): ModelSelection | null {
   const selection = useAtomValue(stickyComposerModelSelectionAtom);
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- starts loading persisted composer drafts from native storage on first use
+  // oxlint-disable-next-line rosewood/no-unreasoned-state-sync -- starts loading persisted composer drafts from native storage on first use
   useEffect(() => {
     ensureComposerDraftsLoaded();
   }, []);

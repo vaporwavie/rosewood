@@ -8,26 +8,26 @@ import {
   type ToolActivityIcon,
   type OrchestrationV2TurnItem,
   type ThreadId,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import {
-  resolveT3McpSummaryAction,
-  resolveT3McpToolDefinition,
-  type T3McpToolDefinition,
-  type T3McpToolSummaryAction,
-} from "@t3tools/shared/t3McpToolPresentation";
-import { classifyMarkdownImageSource } from "@t3tools/client-runtime/markdown-images";
-import { resolveMediaSource } from "@t3tools/client-runtime/media-source";
-import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
-import { isWorkspaceImagePreviewPath } from "@t3tools/shared/mediaPreview";
-import { formatTokens } from "@t3tools/shared/usageFormat";
-import { classifyToolActivity } from "@t3tools/shared/toolActivity";
-import { toolOutputIndicatesFailure } from "@t3tools/shared/toolOutput";
+  resolveRosewoodMcpSummaryAction,
+  resolveRosewoodMcpToolDefinition,
+  type RosewoodMcpToolDefinition,
+  type RosewoodMcpToolSummaryAction,
+} from "@rosewood/shared/rosewoodMcpToolPresentation";
+import { classifyMarkdownImageSource } from "@rosewood/client-runtime/markdown-images";
+import { resolveMediaSource } from "@rosewood/client-runtime/media-source";
+import { sourceControlClients } from "@rosewood/client-runtime/source-control-clients";
+import { isWorkspaceImagePreviewPath } from "@rosewood/shared/mediaPreview";
+import { formatTokens } from "@rosewood/shared/usageFormat";
+import { classifyToolActivity } from "@rosewood/shared/toolActivity";
+import { toolOutputIndicatesFailure } from "@rosewood/shared/toolOutput";
 
 import {
-  summarizeT3ToolCalls,
-  t3ToolResultIndicatesFailure,
-  type T3ToolSummaryCall,
-} from "@t3tools/client-runtime/t3ToolSummary";
+  summarizeRosewoodToolCalls,
+  rosewoodToolResultIndicatesFailure,
+  type RosewoodToolSummaryCall,
+} from "@rosewood/client-runtime/rosewoodToolSummary";
 
 export type WorkLogToolLifecycleStatus = RuntimeItemStatus | "stopped" | "idle";
 
@@ -80,7 +80,7 @@ export function contextCompactionLabel(item: CompactionLabelItem): string {
 }
 
 export interface WorkLogPresentationEntry {
-  readonly questionAnswer?: import("@t3tools/contracts").UserInputAttachmentAnswerPayload;
+  readonly questionAnswer?: import("@rosewood/contracts").UserInputAttachmentAnswerPayload;
   readonly id: string;
   readonly createdAt: string;
   readonly label: string;
@@ -141,7 +141,7 @@ function workEntryToolName(
     return `${data.server}.${data.tool}`;
   }
   if (typeof data?.toolName === "string") return data.toolName;
-  return resolveT3McpToolDefinition(entry.toolTitle) ? entry.toolTitle : entry.label;
+  return resolveRosewoodMcpToolDefinition(entry.toolTitle) ? entry.toolTitle : entry.label;
 }
 
 function workEntryToolInput(
@@ -164,8 +164,8 @@ function workEntryToolOutput(
     : (data?.output ?? data?.result ?? data?.rawOutput ?? data?.content);
 }
 
-function resolveT3McpToolPresentation(
-  definition: T3McpToolDefinition | null,
+function resolveRosewoodMcpToolPresentation(
+  definition: RosewoodMcpToolDefinition | null,
   status: string | undefined,
   data?: unknown,
 ) {
@@ -230,14 +230,16 @@ export function resolveWorkEntryToolPresentation(
   >,
   fallbackStatus?: "inProgress" | "completed",
 ) {
-  const definition = resolveT3McpToolDefinition(
+  const definition = resolveRosewoodMcpToolDefinition(
     workEntryToolName(entry),
     workEntryToolInput(entry),
   );
   const status = entry.toolLifecycleStatus ?? fallbackStatus;
-  return resolveT3McpToolPresentation(
+  return resolveRosewoodMcpToolPresentation(
     definition,
-    definition && t3ToolResultIndicatesFailure(workEntryToolOutput(entry)) ? "failed" : status,
+    definition && rosewoodToolResultIndicatesFailure(workEntryToolOutput(entry))
+      ? "failed"
+      : status,
     entry.toolData,
   );
 }
@@ -271,8 +273,8 @@ function workEntryIndicatesToolFailureFromOutput(
   // "that exit code 2 is expected" as a failed tool.
   if (!workLogEntryIsToolLike(entry) || entry.itemType === "reasoning") return false;
   if (
-    resolveT3McpToolDefinition(workEntryToolName(entry)) &&
-    t3ToolResultIndicatesFailure(workEntryToolOutput(entry))
+    resolveRosewoodMcpToolDefinition(workEntryToolName(entry)) &&
+    rosewoodToolResultIndicatesFailure(workEntryToolOutput(entry))
   ) {
     return true;
   }
@@ -456,7 +458,7 @@ function toolGroupActionLabel(action: ToolGroupAction, count: number): string {
   }
 }
 
-function t3ToolSummaryCall(entry: WorkLogPresentationEntry): T3ToolSummaryCall {
+function rosewoodToolSummaryCall(entry: WorkLogPresentationEntry): RosewoodToolSummaryCall {
   return {
     input: workEntryToolInput(entry),
     output: workEntryToolOutput(entry),
@@ -471,7 +473,7 @@ function t3ToolSummaryCall(entry: WorkLogPresentationEntry): T3ToolSummaryCall {
   };
 }
 
-function summaryActionPriority(action: ToolGroupAction | T3McpToolSummaryAction): number {
+function summaryActionPriority(action: ToolGroupAction | RosewoodMcpToolSummaryAction): number {
   switch (action) {
     case "command":
     case "edit":
@@ -527,35 +529,35 @@ export function summarizeToolGroup(entries: ReadonlyArray<WorkLogPresentationEnt
   }
   entries = toolEntries;
   const groups = new Map<
-    ToolGroupAction | T3McpToolSummaryAction,
+    ToolGroupAction | RosewoodMcpToolSummaryAction,
     {
       action: ToolGroupAction;
-      t3Action: T3McpToolSummaryAction | null;
+      rosewoodAction: RosewoodMcpToolSummaryAction | null;
       entries: WorkLogPresentationEntry[];
     }
   >();
   const sources = new Map<string, ToolActivitySource>();
   for (const entry of entries) {
-    const t3Action = resolveT3McpSummaryAction(
+    const rosewoodAction = resolveRosewoodMcpSummaryAction(
       workEntryToolName(entry),
-      t3ToolSummaryCall(entry).input,
+      rosewoodToolSummaryCall(entry).input,
     );
-    if (entry.toolSource && t3Action === null) {
+    if (entry.toolSource && rosewoodAction === null) {
       sources.set(entry.toolSource.key, entry.toolSource);
       continue;
     }
     const action = toolGroupAction(entry);
-    const key = t3Action ?? action;
+    const key = rosewoodAction ?? action;
     const group = groups.get(key);
     if (group) group.entries.push(entry);
-    else groups.set(key, { action, t3Action, entries: [entry] });
+    else groups.set(key, { action, rosewoodAction, entries: [entry] });
   }
   const summaries = [...groups].map(([action, group], index) => ({
     index,
     count: group.entries.length,
     priority: summaryActionPriority(action),
-    ...(group.t3Action
-      ? summarizeT3ToolCalls(group.t3Action, group.entries.map(t3ToolSummaryCall))
+    ...(group.rosewoodAction
+      ? summarizeRosewoodToolCalls(group.rosewoodAction, group.entries.map(rosewoodToolSummaryCall))
       : {
           label: toolGroupActionLabel(
             group.action,
@@ -586,7 +588,7 @@ export function summarizeToolGroup(entries: ReadonlyArray<WorkLogPresentationEnt
   const sourcedCount = entries.filter(
     (entry) =>
       entry.toolSource !== undefined &&
-      resolveT3McpToolDefinition(workEntryToolName(entry)) === null,
+      resolveRosewoodMcpToolDefinition(workEntryToolName(entry)) === null,
   ).length;
   const remainingCount =
     entries.length - sourcedCount - selected.reduce((count, group) => count + group.count, 0);

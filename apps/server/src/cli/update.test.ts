@@ -1,7 +1,7 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, it } from "@effect/vitest";
-import type { ManagedUpdatesPolicy } from "@t3tools/contracts";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import type { ManagedUpdatesPolicy } from "@rosewood/contracts";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import * as Duration from "effect/Duration";
 import * as Effect from "effect/Effect";
 import * as Exit from "effect/Exit";
@@ -43,7 +43,7 @@ it.effect("authenticates each release page until the requested channel is found"
     const httpClient = HttpClient.make((request) => {
       const url = new URL(request.url);
       assert.equal(url.origin, "https://api.github.com");
-      assert.equal(url.pathname, "/repos/pingdotgg/t3code/releases");
+      assert.equal(url.pathname, "/repos/vaporwavie/rosewood/releases");
       assert.equal(request.headers.accept, "application/vnd.github+json");
       assert.equal(request.headers.authorization, "Bearer gh-token");
       const page = url.searchParams.get("page") ?? "";
@@ -60,7 +60,7 @@ it.effect("authenticates each release page until the requested channel is found"
   }),
 );
 
-it.layer(NodeServices.layer)("t3 update under a managed policy", (it) => {
+it.layer(NodeServices.layer)("rosewood update under a managed policy", (it) => {
   const runWithPolicy = (
     updates: ManagedUpdatesPolicy,
     input: { readonly channel?: "stable" | "nightly"; readonly requestedVersion?: string } = {},
@@ -96,7 +96,7 @@ it.layer(NodeServices.layer)("t3 update under a managed policy", (it) => {
   it.effect("refuses to update when updates are off", () =>
     Effect.gen(function* () {
       const error = yield* runWithPolicy({ mode: "off" });
-      assert.equal(error.message, "Example Corp manages T3 Code updates.");
+      assert.equal(error.message, "Example Corp manages Rosewood updates.");
     }),
   );
 
@@ -113,22 +113,22 @@ it.layer(NodeServices.layer)("t3 update under a managed policy", (it) => {
       for (const error of [byChannel, byVersion]) {
         assert.equal(
           error.message,
-          "Example Corp manages T3 Code updates. Only stable releases can be installed.",
+          "Example Corp manages Rosewood updates. Only stable releases can be installed.",
         );
       }
     }),
   );
 });
 
-it.layer(NodeServices.layer)("t3 update launcher", (it) => {
+it.layer(NodeServices.layer)("rosewood update launcher", (it) => {
   it.effect("repoints a symlink that lives in a runtime versions tree", () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const root = yield* fs.makeTempDirectoryScoped({ prefix: "t3-update-" });
-      const oldExe = path.join(root, "runtime/versions/1.0.0/t3");
-      const newExe = path.join(root, "runtime/versions/2.0.0/t3");
-      const launcher = path.join(root, "bin/t3");
+      const root = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-update-" });
+      const oldExe = path.join(root, "runtime/versions/1.0.0/rosewood");
+      const newExe = path.join(root, "runtime/versions/2.0.0/rosewood");
+      const launcher = path.join(root, "bin/rosewood");
       for (const file of [oldExe, newExe]) {
         yield* fs.makeDirectory(path.dirname(file), { recursive: true });
         yield* fs.writeFileString(file, "");
@@ -150,37 +150,37 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
   it.effect.each([
     { name: "no launcher records", recorded: undefined },
     { name: "an empty launcher record", recorded: "" },
-    { name: "whole launcher records", recorded: "/opt/t3\n" },
-    { name: "Windows launcher records", recorded: "C:\\t3.cmd\r\n" },
+    { name: "whole launcher records", recorded: "/opt/rosewood\n" },
+    { name: "Windows launcher records", recorded: "C:\\rosewood.cmd\r\n" },
     // An interrupted append cut this record short.
     { name: "an unterminated launcher record", recorded: "/opt/t" },
-    // Another process's append is cut short after t3 update reads the records.
-    { name: "a record cut short after the read", recorded: "/opt/t3\n", cut: "/opt/t" },
+    // Another process's append is cut short after rosewood update reads the records.
+    { name: "a record cut short after the read", recorded: "/opt/rosewood\n", cut: "/opt/t" },
   ])("keeps the runtime a repointed launcher off PATH points at with $name", ({ recorded, cut }) =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const root = yield* fs.makeTempDirectoryScoped({ prefix: "t3-update-" });
+      const root = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-update-" });
       yield* TestClock.setTime(Duration.toMillis(Duration.days(1)));
       for (const version of ["1.0.0", "2.0.0"]) {
         const directory = path.join(root, "runtime/versions", version);
         yield* fs.makeDirectory(directory, { recursive: true });
-        yield* fs.writeFileString(path.join(directory, "t3"), "");
+        yield* fs.writeFileString(path.join(directory, "rosewood"), "");
         yield* fs.writeFileString(path.join(directory, ".install-complete"), `${version}\n`);
         yield* fs.utimes(path.join(directory, ".install-complete"), 0, 0);
       }
       if (recorded !== undefined) {
         yield* fs.writeFileString(path.join(root, "runtime/launchers"), recorded);
       }
-      // A launcher in the T3 home itself, which neither PATH nor the default bin dir reaches.
-      const launcher = path.join(root, "t3");
-      yield* fs.symlink(path.join(root, "runtime/versions/1.0.0/t3"), launcher);
+      // A launcher in the Rosewood home itself, which neither PATH nor the default bin dir reaches.
+      const launcher = path.join(root, "rosewood");
+      yield* fs.symlink(path.join(root, "runtime/versions/1.0.0/rosewood"), launcher);
 
       const launchersFile = path.join(root, "runtime/launchers");
       yield* repointLauncher({
         launchedAs: launcher,
         baseDir: root,
-        targetEntryPath: path.join(root, "runtime/versions/2.0.0/t3"),
+        targetEntryPath: path.join(root, "runtime/versions/2.0.0/rosewood"),
       }).pipe(
         Effect.provideService(FileSystem.FileSystem, {
           ...fs,
@@ -196,7 +196,7 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
               ),
         }),
       );
-      // A later server start prunes with no idea how this machine launches t3.
+      // A later server start prunes with no idea how this machine launches rosewood.
       const removed = yield* prunePinnedRuntimes({ baseDir: root, keep: [] }).pipe(
         Effect.provideService(ProcessRunner.ProcessRunner, unrelatedLsof),
         Effect.provideService(HostProcess.Platform, "darwin"),
@@ -208,7 +208,7 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
       // macOS temp dirs sit behind the /var -> /private/var symlink, so compare canonical paths.
       assert.equal(
         yield* fs.realPath(launcher),
-        yield* fs.realPath(path.join(root, "runtime/versions/2.0.0/t3")),
+        yield* fs.realPath(path.join(root, "runtime/versions/2.0.0/rosewood")),
       );
     }).pipe(Effect.scoped, Effect.provideService(HostProcess.Platform, "linux")),
   );
@@ -216,10 +216,10 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
   const launcherFixture = Effect.fnUntraced(function* () {
     const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
-    const root = yield* fs.makeTempDirectoryScoped({ prefix: "t3-update-" });
-    const oldExe = path.join(root, "runtime/versions/1.0.0/t3");
-    const newExe = path.join(root, "runtime/versions/2.0.0/t3");
-    const launcher = path.join(root, "t3");
+    const root = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-update-" });
+    const oldExe = path.join(root, "runtime/versions/1.0.0/rosewood");
+    const newExe = path.join(root, "runtime/versions/2.0.0/rosewood");
+    const launcher = path.join(root, "rosewood");
     for (const file of [oldExe, newExe]) {
       yield* fs.makeDirectory(path.dirname(file), { recursive: true });
       yield* fs.writeFileString(file, "");
@@ -263,7 +263,7 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
   );
 
   it.effect.each(["recording", "repointing"] as const)(
-    "never leaves a repointed launcher unrecorded when t3 update dies while %s",
+    "never leaves a repointed launcher unrecorded when rosewood update dies while %s",
     (step) =>
       Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
@@ -278,11 +278,11 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
             ...fs,
             writeFileString: (path, data, options) =>
               step === "recording" && path === launchersFile
-                ? Effect.die("t3 update was killed")
+                ? Effect.die("rosewood update was killed")
                 : fs.writeFileString(path, data, options),
             rename: (from, to) =>
               step === "repointing" && to === launcher
-                ? Effect.die("t3 update was killed")
+                ? Effect.die("rosewood update was killed")
                 : fs.rename(from, to),
           }),
           Effect.exit,
@@ -302,13 +302,13 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const root = yield* fs.makeTempDirectoryScoped({ prefix: "t3-update-" });
-      const newExe = path.join(root, "runtime/versions/2.0.0/t3");
-      const copy = path.join(root, "copy/t3");
-      const foreign = path.join(root, "foreign/t3");
-      const elsewhere = path.join(root, "elsewhere/t3");
-      const otherHome = path.join(root, "other/runtime/versions/1.0.0/t3");
-      const otherLauncher = path.join(root, "other/bin/t3");
+      const root = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-update-" });
+      const newExe = path.join(root, "runtime/versions/2.0.0/rosewood");
+      const copy = path.join(root, "copy/rosewood");
+      const foreign = path.join(root, "foreign/rosewood");
+      const elsewhere = path.join(root, "elsewhere/rosewood");
+      const otherHome = path.join(root, "other/runtime/versions/1.0.0/rosewood");
+      const otherLauncher = path.join(root, "other/bin/rosewood");
       for (const file of [newExe, copy, elsewhere, otherHome]) {
         yield* fs.makeDirectory(path.dirname(file), { recursive: true });
         yield* fs.writeFileString(file, "");
@@ -335,25 +335,25 @@ it.layer(NodeServices.layer)("t3 update launcher", (it) => {
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const root = yield* fs.makeTempDirectoryScoped({ prefix: "t3-update-" });
-      const launcher = path.join(root, "bin/t3");
+      const root = yield* fs.makeTempDirectoryScoped({ prefix: "rosewood-update-" });
+      const launcher = path.join(root, "bin/rosewood");
       yield* fs.makeDirectory(path.dirname(launcher), { recursive: true });
       yield* fs.writeFileString(launcher, "");
 
       const bare = yield* resolveLauncherPath.pipe(
-        Effect.provideService(HostProcess.InvokedAs, "t3"),
+        Effect.provideService(HostProcess.InvokedAs, "rosewood"),
         Effect.provideService(HostProcess.Environment, {
           PATH: `${path.join(root, "missing")}:${path.join(root, "bin")}`,
         }),
         Effect.provideService(HostProcess.WorkingDirectory, root),
       );
       const relative = yield* resolveLauncherPath.pipe(
-        Effect.provideService(HostProcess.InvokedAs, "./bin/t3"),
+        Effect.provideService(HostProcess.InvokedAs, "./bin/rosewood"),
         Effect.provideService(HostProcess.Environment, { PATH: "" }),
         Effect.provideService(HostProcess.WorkingDirectory, root),
       );
       const absent = yield* resolveLauncherPath.pipe(
-        Effect.provideService(HostProcess.InvokedAs, "t3"),
+        Effect.provideService(HostProcess.InvokedAs, "rosewood"),
         Effect.provideService(HostProcess.Environment, { PATH: path.join(root, "missing") }),
         Effect.provideService(HostProcess.WorkingDirectory, root),
       );

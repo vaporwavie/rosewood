@@ -13,11 +13,11 @@ describe("DesktopEarlyElectronStartup", () => {
 
   it("reads the persisted linux password-store preference before Electron is ready", () => {
     const preference = resolveEarlyLinuxPasswordStorePreference({
-      env: { T3CODE_HOME: "/home/user/.t3-test" },
+      env: { ROSEWOOD_HOME: "/home/user/.rosewood-test" },
       homeDirectory: "/home/user",
       joinPath,
       readFileString: (path) => {
-        assert.equal(path, "/home/user/.t3-test/userdata/desktop-settings.json");
+        assert.equal(path, "/home/user/.rosewood-test/userdata/desktop-settings.json");
         return JSON.stringify({ linuxPasswordStore: "kwallet6" });
       },
     });
@@ -27,7 +27,7 @@ describe("DesktopEarlyElectronStartup", () => {
 
   it("accepts JSONC in the early desktop settings file", () => {
     const preference = resolveEarlyLinuxPasswordStorePreference({
-      env: { T3CODE_HOME: "/home/user/.t3-test" },
+      env: { ROSEWOOD_HOME: "/home/user/.rosewood-test" },
       homeDirectory: "/home/user",
       joinPath,
       readFileString: () => `{
@@ -133,7 +133,7 @@ describe("DesktopEarlyElectronStartup", () => {
 
 describe("Linux device scale persistence failures", () => {
   const input = {
-    env: { T3CODE_HOME: "/isolated" },
+    env: { ROSEWOOD_HOME: "/isolated" },
     homeDirectory: "/home/user",
     joinPath: NodePath.posix.join,
   };

@@ -1,14 +1,14 @@
-import { type EnvironmentShellSummary } from "@t3tools/client-runtime/state/shell";
-import type { EnvironmentId, ServerConfig } from "@t3tools/contracts";
+import { type EnvironmentShellSummary } from "@rosewood/client-runtime/state/shell";
+import type { EnvironmentId, ServerConfig } from "@rosewood/contracts";
 
 import {
   type EnvironmentConnectionPhase,
   type NetworkStatus,
-} from "@t3tools/client-runtime/connection";
+} from "@rosewood/client-runtime/connection";
 
-import type { EnvironmentConnectionSummary as WorkspaceEnvironment } from "@t3tools/client-runtime/state/presentation";
+import type { EnvironmentConnectionSummary as WorkspaceEnvironment } from "@rosewood/client-runtime/state/presentation";
 
-export type { EnvironmentConnectionSummary as WorkspaceEnvironment } from "@t3tools/client-runtime/state/presentation";
+export type { EnvironmentConnectionSummary as WorkspaceEnvironment } from "@rosewood/client-runtime/state/presentation";
 
 export interface WorkspaceConnectionState {
   readonly isLoadingConnections: boolean;

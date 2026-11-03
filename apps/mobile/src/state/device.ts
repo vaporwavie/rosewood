@@ -1,6 +1,6 @@
-import { createDeviceEnvironmentAtoms } from "@t3tools/client-runtime/state/device";
-import { resolveDeviceHubAccess } from "@t3tools/client-runtime/state/deviceHubAccess";
-import type { EnvironmentId } from "@t3tools/contracts";
+import { createDeviceEnvironmentAtoms } from "@rosewood/client-runtime/state/device";
+import { resolveDeviceHubAccess } from "@rosewood/client-runtime/state/deviceHubAccess";
+import type { EnvironmentId } from "@rosewood/contracts";
 import * as Effect from "effect/Effect";
 import * as Option from "effect/Option";
 import { Atom } from "effect/reactivity";

@@ -1,6 +1,6 @@
-import { AgentScope } from "@t3tools/shared/AgentScope";
-import * as KeyedLock from "@t3tools/shared/KeyedLock";
-import { resolveProjectSettings } from "@t3tools/shared/projectSettings";
+import { AgentScope } from "@rosewood/shared/AgentScope";
+import * as KeyedLock from "@rosewood/shared/KeyedLock";
+import { resolveProjectSettings } from "@rosewood/shared/projectSettings";
 import {
   isOrchestrationV2WorkActive,
   ModelSelection,
@@ -12,7 +12,7 @@ import {
   ProviderSessionId,
   ThreadId,
   type ProviderThreadId,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import * as Cause from "effect/Cause";
 import * as Clock from "effect/Clock";
 import * as Context from "effect/Context";
@@ -42,15 +42,15 @@ import {
 } from "../observability/Metrics.ts";
 import { ProviderWorkspaceMissingError } from "../provider/Errors.ts";
 import * as ProjectService from "../project/ProjectService.ts";
-import * as McpProviderSessions from "@t3tools/provider-core/server/McpProviderSessions";
+import * as McpProviderSessions from "@rosewood/provider-core/server/McpProviderSessions";
 import * as ServerSettings from "../serverSettings.ts";
 import * as McpSessionRegistry from "../mcp/McpSessionRegistry.ts";
 import * as EventSink from "./EventSink.ts";
 import * as CommandOutputHub from "./CommandOutputHub.ts";
-import * as IdAllocator from "@t3tools/provider-core/server/IdAllocator";
+import * as IdAllocator from "@rosewood/provider-core/server/IdAllocator";
 import * as ProviderEventIngestor from "./ProviderEventIngestor.ts";
-import * as ProviderAdapter from "@t3tools/provider-core/server/ProviderAdapter";
-import { makeProviderFailure } from "@t3tools/provider-core/server/failure";
+import * as ProviderAdapter from "@rosewood/provider-core/server/ProviderAdapter";
+import { makeProviderFailure } from "@rosewood/provider-core/server/failure";
 import * as ProviderAdapterRegistry from "./ProviderAdapterRegistry.ts";
 import * as ProjectionStore from "./ProjectionStore.ts";
 
@@ -213,7 +213,7 @@ export interface ProviderSessionManagerV2Shape {
 export class ProviderSessionManagerV2 extends Context.Service<
   ProviderSessionManagerV2,
   ProviderSessionManagerV2Shape
->()("t3/orchestration-v2/ProviderSessionManager/ProviderSessionManagerV2") {}
+>()("rosewood/orchestration-v2/ProviderSessionManager/ProviderSessionManagerV2") {}
 
 interface LiveSessionEntry {
   readonly attachedThreadIds: ReadonlySet<ThreadId>;
@@ -2002,7 +2002,7 @@ export const layerWithOptions = (
                   }
                   // Some providers can block before a run subscriber exists
                   // (project trust, login, or session-switch hooks). Persist
-                  // their runless request artifacts directly so the normal T3
+                  // their runless request artifacts directly so the normal Rosewood
                   // request UI can answer them and unblock session setup.
                   const threadId = sessionScopedRuntimeRequestThreadId(event);
                   if (threadId !== undefined) {

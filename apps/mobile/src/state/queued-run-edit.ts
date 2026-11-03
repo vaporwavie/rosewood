@@ -4,14 +4,14 @@ import type {
   OrchestrationMessageContext,
   RunId,
   UploadChatAttachment,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import { useAtomValue } from "@effect/atom-react";
-import { stripAttachmentOnlyBootstrapPrompt } from "@t3tools/shared/composerContextReferences";
+import { stripAttachmentOnlyBootstrapPrompt } from "@rosewood/shared/composerContextReferences";
 import {
   makeQueuedRunEditStore,
   resolveQueuedEditExit,
   type QueuedRunsAtom,
-} from "@t3tools/client-runtime/queued-run-edit";
+} from "@rosewood/client-runtime/queued-run-edit";
 
 import { uploadedComposerContext } from "../lib/composerContext";
 import { appAtomRegistry } from "./atom-registry";

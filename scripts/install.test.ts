@@ -1,5 +1,5 @@
 // @effect-diagnostics nodeBuiltinImport:off - Drives the real shell installer against a local GitHub fixture.
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import * as NodeChildProcess from "node:child_process";
 import * as NodeCrypto from "node:crypto";
 import * as NodeFSP from "node:fs/promises";
@@ -15,20 +15,24 @@ const nightlies = Array.from({ length: 100 }, (_, index) => ({
 describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer home", () => {
   it("installs a relative home from a directory ending in a newline", async () => {
     const temporaryRoot = await NodeFSP.realpath(
-      await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "t3-install-home-")),
+      await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "rosewood-install-home-")),
     );
     const root = NodePath.join(temporaryRoot, "cwd\n");
     const homeName = "-custom home\\home\n";
     const home = NodePath.join(root, homeName);
     const version = "1.2.3";
     const target = NodePath.join(home, "runtime/versions", version);
-    const launcher = NodePath.join(root, "bin/t3");
+    const launcher = NodePath.join(root, "bin/rosewood");
     try {
       await NodeFSP.mkdir(target, { recursive: true });
       await NodeFSP.writeFile(NodePath.join(target, ".install-complete"), `${version}\n`);
-      await NodeFSP.writeFile(NodePath.join(target, "t3"), "#!/bin/sh\necho 't3 v1.2.3'\n", {
-        mode: 0o755,
-      });
+      await NodeFSP.writeFile(
+        NodePath.join(target, "rosewood"),
+        "#!/bin/sh\necho 'rosewood v1.2.3'\n",
+        {
+          mode: 0o755,
+        },
+      );
       const { status, stdout, stderr } = NodeChildProcess.spawnSync(
         "sh",
         [NodePath.resolve(import.meta.dirname, "install.sh")],
@@ -37,23 +41,23 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer home
           env: {
             ...process.env,
             HOME: root,
-            T3CODE_HOME: homeName,
-            T3CODE_VERSION: version,
-            T3CODE_INSTALL_BIN_DIR: NodePath.dirname(launcher),
-            T3CODE_RELEASE_BASE_URL: "http://127.0.0.1:1",
+            ROSEWOOD_HOME: homeName,
+            ROSEWOOD_VERSION: version,
+            ROSEWOOD_INSTALL_BIN_DIR: NodePath.dirname(launcher),
+            ROSEWOOD_RELEASE_BASE_URL: "http://127.0.0.1:1",
           },
           encoding: "utf8",
         },
       );
       expect(status, stdout + stderr).toBe(0);
-      expect(stderr).toContain(`Installed T3 Code ${version}`);
-      expect(await NodeFSP.readlink(launcher)).toBe(NodePath.join(target, "t3"));
+      expect(stderr).toContain(`Installed Rosewood ${version}`);
+      expect(await NodeFSP.readlink(launcher)).toBe(NodePath.join(target, "rosewood"));
       expect(
         NodeChildProcess.execFileSync(launcher, ["--version"], {
           cwd: NodeOS.tmpdir(),
           encoding: "utf8",
         }).trim(),
-      ).toBe("t3 v1.2.3");
+      ).toBe("rosewood v1.2.3");
     } finally {
       await NodeFSP.rm(temporaryRoot, { recursive: true, force: true });
     }
@@ -66,15 +70,15 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chan
     ["stable", "1.2.3"],
     ["preview", "1.2.4-preview.20261019.50"],
   ])("finds the newest %s release behind a full page of nightlies", async (channel, version) => {
-    const root = await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "t3-install-index-"));
+    const root = await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "rosewood-install-index-"));
     const target = NodePath.join(root, "home/runtime/versions", version);
     const server = NodeHttp.createServer((request, response) => {
       const url = new URL(request.url ?? "/", "http://fixture");
       const body =
-        url.pathname === "/pingdotgg/t3code/releases/latest" &&
+        url.pathname === "/vaporwavie/rosewood/releases/latest" &&
         request.headers.accept === "application/json"
           ? { tag_name: "v1.2.3" }
-          : url.pathname === "/repos/pingdotgg/t3code/releases"
+          : url.pathname === "/repos/vaporwavie/rosewood/releases"
             ? { "1": nightlies, "2": [{ tag_name: `v${version}` }, { tag_name: "v1.2.3" }] }[
                 url.searchParams.get("page") ?? ""
               ]
@@ -102,12 +106,12 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chan
           const child = NodeChildProcess.spawn("sh", [installer], {
             env: {
               ...process.env,
-              T3CODE_VERSION: "",
-              T3CODE_CHANNEL: channel,
-              T3CODE_HOME: NodePath.join(root, "home"),
-              T3CODE_INSTALL_BIN_DIR: NodePath.join(root, "bin"),
+              ROSEWOOD_VERSION: "",
+              ROSEWOOD_CHANNEL: channel,
+              ROSEWOOD_HOME: NodePath.join(root, "home"),
+              ROSEWOOD_INSTALL_BIN_DIR: NodePath.join(root, "bin"),
               // A wrong version must fail here instead of downloading a real release.
-              T3CODE_RELEASE_BASE_URL: origin,
+              ROSEWOOD_RELEASE_BASE_URL: origin,
             },
             stdio: ["ignore", "pipe", "pipe"],
           });
@@ -119,7 +123,7 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chan
         },
       );
       expect(code, output).toBe(0);
-      expect(output).toContain(`Installed T3 Code ${version}`);
+      expect(output).toContain(`Installed Rosewood ${version}`);
     } finally {
       server.closeAllConnections();
       await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -142,10 +146,12 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chec
       );
       expect(availableTools.length).toBeGreaterThan(0);
       for (const checksumTool of availableTools) {
-        const root = await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "t3-install-checksum-"));
+        const root = await NodeFSP.mkdtemp(
+          NodePath.join(NodeOS.tmpdir(), "rosewood-install-checksum-"),
+        );
         const home = NodePath.join(root, homeName);
         const version = "1.2.3";
-        const stem = `t3-${version}-linux-${HostProcess.Architecture.defaultValue()}`;
+        const stem = `rosewood-${version}-linux-${HostProcess.Architecture.defaultValue()}`;
         const archiveName = `${stem}.tar.gz`;
         const server = NodeHttp.createServer();
         try {
@@ -175,8 +181,8 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chec
           }
           await NodeFSP.mkdir(NodePath.join(root, stem));
           await NodeFSP.writeFile(
-            NodePath.join(root, stem, "t3"),
-            "#!/bin/sh\necho 't3 v1.2.3'\n",
+            NodePath.join(root, stem, "rosewood"),
+            "#!/bin/sh\necho 'rosewood v1.2.3'\n",
             { mode: 0o755 },
           );
           const archivePath = NodePath.join(root, archiveName);
@@ -202,10 +208,10 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chec
                   env: {
                     ...process.env,
                     PATH: tools,
-                    T3CODE_VERSION: version,
-                    T3CODE_HOME: home,
-                    T3CODE_INSTALL_BIN_DIR: NodePath.join(root, "bin"),
-                    T3CODE_RELEASE_BASE_URL: `http://127.0.0.1:${address.port}`,
+                    ROSEWOOD_VERSION: version,
+                    ROSEWOOD_HOME: home,
+                    ROSEWOOD_INSTALL_BIN_DIR: NodePath.join(root, "bin"),
+                    ROSEWOOD_RELEASE_BASE_URL: `http://127.0.0.1:${address.port}`,
                   },
                   stdio: ["ignore", "pipe", "pipe"],
                 },
@@ -224,14 +230,14 @@ describe.skipIf(HostProcess.Platform.defaultValue() !== "linux")("installer chec
               await NodeFSP.readFile(NodePath.join(versions, version, ".install-complete"), "utf8"),
             ).toBe("1.2.3\n");
             expect(
-              NodeChildProcess.execFileSync(NodePath.join(root, "bin/t3"), ["--version"], {
+              NodeChildProcess.execFileSync(NodePath.join(root, "bin/rosewood"), ["--version"], {
                 encoding: "utf8",
               }).trim(),
-            ).toBe("t3 v1.2.3");
+            ).toBe("rosewood v1.2.3");
           } else {
             expect(code).not.toBe(0);
             expect(output).toContain("checksum mismatch");
-            expect(output).not.toContain("Installed T3 Code");
+            expect(output).not.toContain("Installed Rosewood");
             expect(await NodeFSP.readdir(versions)).toEqual([]);
           }
         } finally {

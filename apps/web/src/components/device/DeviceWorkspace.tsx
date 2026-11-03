@@ -1,9 +1,9 @@
-import type { DeviceHostSummary, DeviceSummary, EnvironmentId } from "@t3tools/contracts";
+import type { DeviceHostSummary, DeviceSummary, EnvironmentId } from "@rosewood/contracts";
 import { useRef, useState } from "react";
 import {
   captureDeviceScreenshot,
   DeviceScreenshotError,
-} from "@t3tools/client-runtime/device/screenshot";
+} from "@rosewood/client-runtime/device/screenshot";
 import { refreshDeviceHubAccess, useDeviceHubAccess } from "~/state/device";
 import { DeviceControlsRail } from "./DeviceControlsRail";
 import { DeviceStreamView } from "./DeviceStreamView";

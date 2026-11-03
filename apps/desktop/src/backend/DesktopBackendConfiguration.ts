@@ -1,7 +1,7 @@
 import * as NodeOS from "node:os";
 
-import { parsePersistedServerObservabilitySettings } from "@t3tools/shared/serverSettings";
-import { currentDesktopBootstrapToken } from "@t3tools/shared/desktopBootstrapToken";
+import { parsePersistedServerObservabilitySettings } from "@rosewood/shared/serverSettings";
+import { currentDesktopBootstrapToken } from "@rosewood/shared/desktopBootstrapToken";
 import * as Clock from "effect/Clock";
 import * as Context from "effect/Context";
 import * as SecureRandom from "effect/crypto/SecureRandom";
@@ -54,7 +54,7 @@ export class DesktopBackendConfiguration extends Context.Service<
     readonly resolvePrimaryLabel: Effect.Effect<string>;
     readonly currentBootstrapToken: Effect.Effect<string, PlatformError.PlatformError>;
   }
->()("@t3tools/desktop/backend/DesktopBackendConfiguration") {}
+>()("@rosewood/desktop/backend/DesktopBackendConfiguration") {}
 
 interface BackendObservabilitySettings {
   readonly otlpTracesUrl: Option.Option<string>;
@@ -69,32 +69,32 @@ const emptyBackendObservabilitySettings: BackendObservabilitySettings = {
 };
 
 const DESKTOP_BACKEND_ENV_NAMES = [
-  "T3CODE_PORT",
-  "T3CODE_MODE",
-  "T3CODE_NO_BROWSER",
-  "T3CODE_HOST",
-  "T3CODE_DESKTOP_WS_URL",
-  "T3CODE_DESKTOP_LAN_HOST",
-  "T3CODE_DESKTOP_HTTPS_ENDPOINTS",
-  "T3CODE_TAILSCALE_SERVE",
-  "T3CODE_TAILSCALE_SERVE_PORT",
+  "ROSEWOOD_PORT",
+  "ROSEWOOD_MODE",
+  "ROSEWOOD_NO_BROWSER",
+  "ROSEWOOD_HOST",
+  "ROSEWOOD_DESKTOP_WS_URL",
+  "ROSEWOOD_DESKTOP_LAN_HOST",
+  "ROSEWOOD_DESKTOP_HTTPS_ENDPOINTS",
+  "ROSEWOOD_TAILSCALE_SERVE",
+  "ROSEWOOD_TAILSCALE_SERVE_PORT",
 ] as const;
 
 // Windows forwards these variables into WSL only through WSLENV.
 const WSL_FORWARDED_ENV_NAMES = [
   "OPENAI_API_KEY",
   "ANTHROPIC_API_KEY",
-  "T3CODE_TELEMETRY_ENABLED",
-  "T3CODE_GITHUB_APP_CLIENT_ID",
+  "ROSEWOOD_TELEMETRY_ENABLED",
+  "ROSEWOOD_GITHUB_APP_CLIENT_ID",
   // Otherwise the WSL server keeps exporting to endpoints from the bootstrap.
-  "T3CODE_OTEL_SDK_DISABLED",
+  "ROSEWOOD_OTEL_SDK_DISABLED",
   "OTEL_SDK_DISABLED",
-  "T3CODE_OTLP_HEADERS",
-  "T3CODE_OTLP_PROTOCOL",
-  // Untranslated T3 URLs must override bootstrap endpoints inside WSL, as they do on Windows.
-  "T3CODE_OTLP_TRACES_URL",
-  "T3CODE_OTLP_METRICS_URL",
-  "T3CODE_OTLP_LOGS_URL",
+  "ROSEWOOD_OTLP_HEADERS",
+  "ROSEWOOD_OTLP_PROTOCOL",
+  // Untranslated Rosewood URLs must override bootstrap endpoints inside WSL, as they do on Windows.
+  "ROSEWOOD_OTLP_TRACES_URL",
+  "ROSEWOOD_OTLP_METRICS_URL",
+  "ROSEWOOD_OTLP_LOGS_URL",
   "OTEL_EXPORTER_OTLP_ENDPOINT",
   "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
   "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT",
@@ -162,7 +162,7 @@ const logBackendObservabilitySettingsReadFailure = (
 };
 
 function resourceMonitorBinaryName(platform: NodeJS.Platform): string {
-  return platform === "win32" ? "t3-resource-monitor.exe" : "t3-resource-monitor";
+  return platform === "win32" ? "rosewood-resource-monitor.exe" : "rosewood-resource-monitor";
 }
 
 const resolveResourceMonitorPath = Effect.fn(
@@ -397,7 +397,7 @@ const runWslPreflight = Effect.fn("desktop.backendConfiguration.wslPreflight")(f
           _tag: "Ready",
           runningDistro,
           windowsEntryPath: environment.backendEntryPath,
-          runtime: { kind: "executable", entryPath: `${runtime.linuxAppRoot}/t3` },
+          runtime: { kind: "executable", entryPath: `${runtime.linuxAppRoot}/rosewood` },
           resolvedPath: stagedProbe.resolvedPath,
           runtimeId: input.runtimeArchive.runtimeId,
         } as const;
@@ -500,7 +500,7 @@ const resolvePrimaryStartConfig = Effect.fn("desktop.backendConfiguration.resolv
       mode: "desktop" as const,
       noBrowser: true,
       port: backendExposure.port,
-      t3Home: environment.baseDir,
+      rosewoodHome: environment.baseDir,
       host: backendExposure.bindHost,
       desktopBootstrapToken: input.bootstrapToken,
       desktopBootstrapSecret: input.bootstrapSecret,
@@ -532,8 +532,8 @@ const resolvePrimaryStartConfig = Effect.fn("desktop.backendConfiguration.resolv
       env: {
         ...backendChildEnvPatch(),
         ELECTRON_RUN_AS_NODE: "1",
-        T3CODE_DESKTOP_SHELL_DISCOVERY_PENDING: "1",
-        T3CODE_CLI_PATH: Option.getOrUndefined(input.cliPath),
+        ROSEWOOD_DESKTOP_SHELL_DISCOVERY_PENDING: "1",
+        ROSEWOOD_CLI_PATH: Option.getOrUndefined(input.cliPath),
       },
       extendEnv: true,
       bootstrap,
@@ -569,7 +569,7 @@ const resolveWslStartConfig = Effect.fn("desktop.backendConfiguration.resolveWsl
     mode: "desktop" as const,
     noBrowser: true,
     port: input.port,
-    // Omit t3Home to keep the Linux backend from sharing the primary's Windows SQLite file.
+    // Omit rosewoodHome to keep the Linux backend from sharing the primary's Windows SQLite file.
     host: wslBindHost,
     desktopBootstrapToken: input.bootstrapToken,
     desktopBootstrapSecret: input.bootstrapSecret,
@@ -639,12 +639,12 @@ const resolveWslStartConfig = Effect.fn("desktop.backendConfiguration.resolveWsl
     }
   }
 
-  const parentEnvWithoutT3Home: Record<string, string | undefined> = {};
+  const parentEnvWithoutRosewoodHome: Record<string, string | undefined> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "T3CODE_HOME") continue;
-    parentEnvWithoutT3Home[key] = value;
+    if (key === "ROSEWOOD_HOME") continue;
+    parentEnvWithoutRosewoodHome[key] = value;
   }
-  const wslEnv = mergeWslEnv(parentEnvWithoutT3Home.WSLENV, forwardedEnvNames);
+  const wslEnv = mergeWslEnv(parentEnvWithoutRosewoodHome.WSLENV, forwardedEnvNames);
 
   const baseConfig = {
     executablePath: "wsl.exe",
@@ -652,12 +652,12 @@ const resolveWslStartConfig = Effect.fn("desktop.backendConfiguration.resolveWsl
       preflight._tag === "Ready" ? preflight.windowsEntryPath : environment.backendEntryPath,
     cwd: environment.backendCwd,
     env: {
-      ...parentEnvWithoutT3Home,
+      ...parentEnvWithoutRosewoodHome,
       ...backendChildEnvPatch(),
       ...forwardedEnv,
       ...(wslEnv !== undefined ? { WSLENV: wslEnv } : {}),
     },
-    // env already excludes T3CODE_HOME; merging process.env would restore it.
+    // env already excludes ROSEWOOD_HOME; merging process.env would restore it.
     extendEnv: false,
     bootstrap,
     bootstrapDelivery: "stdin" as const,

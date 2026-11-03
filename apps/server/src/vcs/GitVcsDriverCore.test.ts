@@ -4,7 +4,7 @@ import * as NodeOS from "node:os";
 import * as NodeURL from "node:url";
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as HostProcess from "@rosewood/shared/HostProcess";
 import { assert, it, describe } from "@effect/vitest";
 import * as Cause from "effect/Cause";
 import * as Deferred from "effect/Deferred";
@@ -32,8 +32,8 @@ import {
   type ReviewDiffFileContentsInput,
   type ReviewDiffPreviewResult,
   type WorktreeSubmodules,
-} from "@t3tools/contracts";
-import { symlinksSupported } from "@t3tools/shared/testing/symlinks";
+} from "@rosewood/contracts";
+import { symlinksSupported } from "@rosewood/shared/testing/symlinks";
 import * as ServerConfig from "../config.ts";
 import {
   makeGitVcsDriverCore,
@@ -49,7 +49,7 @@ const decodeVcsRef = Schema.decodeUnknownSync(VcsRef);
 const decodeVcsListRefsResult = Schema.decodeUnknownSync(VcsListRefsResult);
 
 const layerServerConfig = ServerConfig.layerTest(process.cwd(), {
-  prefix: "t3-git-vcs-driver-test-",
+  prefix: "rosewood-git-vcs-driver-test-",
 });
 const layerTest = GitVcsDriver.layer.pipe(
   Layer.provideMerge(layerServerConfig),
@@ -1552,7 +1552,12 @@ it.effect("lets a worktree checkout that is still working run past five minutes"
     const worktreePath = path.join(cwd, "worktree");
 
     const creation = yield* driver
-      .createWorktree({ cwd, refName: "main", newRefName: "t3/slow-checkout", path: worktreePath })
+      .createWorktree({
+        cwd,
+        refName: "main",
+        newRefName: "rosewood/slow-checkout",
+        path: worktreePath,
+      })
       .pipe(Effect.forkChild);
     yield* Deferred.await(checkoutStarted);
     yield* TestClock.adjust("6 minutes");
@@ -1560,7 +1565,7 @@ it.effect("lets a worktree checkout that is still working run past five minutes"
 
     const result = yield* Fiber.join(creation);
     assert.equal(result.worktree.path, worktreePath);
-    assert.equal(result.worktree.refName, "t3/slow-checkout");
+    assert.equal(result.worktree.refName, "rosewood/slow-checkout");
   }).pipe(
     Effect.provide(
       layerServerConfig.pipe(
@@ -1878,7 +1883,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
                   .createWorktree({
                     cwd,
                     refName,
-                    ...(action === "worktree add -b" ? { newRefName: "t3/new-thread" } : {}),
+                    ...(action === "worktree add -b" ? { newRefName: "rosewood/new-thread" } : {}),
                     path: path.join(cwd, "worktree"),
                   })
                   .pipe(Effect.flip);
@@ -3117,11 +3122,11 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         yield* git(cwd, ["push", "upstream", "main"]);
         yield* git(cwd, ["fetch", "origin"]);
         yield* git(cwd, ["fetch", "upstream"]);
-        yield* git(cwd, ["checkout", "-b", "t3/temporary"]);
-        yield* git(cwd, ["config", "branch.t3/temporary.t3-merge-base", "main"]);
+        yield* git(cwd, ["checkout", "-b", "rosewood/temporary"]);
+        yield* git(cwd, ["config", "branch.rosewood/temporary.rosewood-merge-base", "main"]);
         yield* git(cwd, [
           "config",
-          "branch.t3/temporary.t3-merge-base-ref",
+          "branch.rosewood/temporary.rosewood-merge-base-ref",
           "refs/remotes/upstream/main",
         ]);
         yield* writeTextFile(cwd, "feature.txt", "thread work\n");
@@ -3136,7 +3141,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           Effect.gen(function* () {
             if (ChildProcess.isStandardCommand(command) && command.args[0] === "config") {
               if (!(yield* Ref.getAndSet(renameClaimed, true))) {
-                yield* git(cwd, ["branch", "-m", "t3/temporary", "feature/named"]).pipe(
+                yield* git(cwd, ["branch", "-m", "rosewood/temporary", "feature/named"]).pipe(
                   Effect.provideService(GitVcsDriver.GitVcsDriver, outer),
                   Effect.orDie,
                 );
@@ -3154,7 +3159,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
 
         const status = yield* driver.statusDetailsLocal(cwd, { includeBranchChanges: true });
 
-        assert.strictEqual(status.branch, "t3/temporary");
+        assert.strictEqual(status.branch, "rosewood/temporary");
         assert.deepStrictEqual(status.branchChanges, {
           baseRef: null,
           insertions: 1,
@@ -3850,7 +3855,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           "GIT_TERMINAL_PROMPT",
           "SSH_ASKPASS",
           "SSH_ASKPASS_REQUIRE",
-          "T3_TEST_SSH_ASKPASS_LOG",
+          "ROSEWOOD_TEST_SSH_ASKPASS_LOG",
         ] as const;
         const previousEnv = new Map(envKeys.map((key) => [key, process.env[key]]));
 
@@ -3865,7 +3870,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           process.env.GIT_TERMINAL_PROMPT = "1";
           process.env.SSH_ASKPASS = "ssh-askpass";
           process.env.SSH_ASKPASS_REQUIRE = "force";
-          process.env.T3_TEST_SSH_ASKPASS_LOG = sshLogPath;
+          process.env.ROSEWOOD_TEST_SSH_ASKPASS_LOG = sshLogPath;
 
           yield* (yield* GitVcsDriver.GitVcsDriver).statusDetails(cwd);
 
@@ -4085,19 +4090,19 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         const cwd = yield* makeTmpDir();
         yield* initRepoWithCommit(cwd);
         const driver = yield* GitVcsDriver.GitVcsDriver;
-        // A local `t3` branch is why launches start on the flat `t3-<hex>` temporary branch.
-        yield* git(cwd, ["branch", "t3"]);
-        yield* git(cwd, ["checkout", "-b", "t3-abcd1234"]);
-        yield* git(cwd, ["branch", "t3-fix-login"]);
+        // A local `rosewood` branch is why launches start on the flat `rosewood-<hex>` temporary branch.
+        yield* git(cwd, ["branch", "rosewood"]);
+        yield* git(cwd, ["checkout", "-b", "rosewood-abcd1234"]);
+        yield* git(cwd, ["branch", "rosewood-fix-login"]);
 
         const renamed = yield* driver.renameBranch({
           cwd,
-          oldBranch: "t3-abcd1234",
-          newBranch: "t3/fix-login",
+          oldBranch: "rosewood-abcd1234",
+          newBranch: "rosewood/fix-login",
         });
 
-        assert.equal(renamed.branch, "t3-fix-login-1");
-        assert.equal(yield* git(cwd, ["branch", "--show-current"]), "t3-fix-login-1");
+        assert.equal(renamed.branch, "rosewood-fix-login-1");
+        assert.equal(yield* git(cwd, ["branch", "--show-current"]), "rosewood-fix-login-1");
       }),
     );
 
@@ -4106,18 +4111,18 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         const cwd = yield* makeTmpDir();
         yield* initRepoWithCommit(cwd);
         const driver = yield* GitVcsDriver.GitVcsDriver;
-        yield* git(cwd, ["branch", "t3"]);
-        yield* git(cwd, ["checkout", "-b", "t3-abcd1234"]);
-        yield* git(cwd, ["branch", "t3-fix-login/child"]);
+        yield* git(cwd, ["branch", "rosewood"]);
+        yield* git(cwd, ["checkout", "-b", "rosewood-abcd1234"]);
+        yield* git(cwd, ["branch", "rosewood-fix-login/child"]);
 
         const renamed = yield* driver.renameBranch({
           cwd,
-          oldBranch: "t3-abcd1234",
-          newBranch: "t3/fix-login",
+          oldBranch: "rosewood-abcd1234",
+          newBranch: "rosewood/fix-login",
         });
 
-        assert.equal(renamed.branch, "t3-fix-login-1");
-        assert.equal(yield* git(cwd, ["branch", "--show-current"]), "t3-fix-login-1");
+        assert.equal(renamed.branch, "rosewood-fix-login-1");
+        assert.equal(yield* git(cwd, ["branch", "--show-current"]), "rosewood-fix-login-1");
       }),
     );
 
@@ -4260,7 +4265,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           yield* git(cwd, ["rev-parse", "HEAD"]),
         );
         assert.equal(
-          yield* git(cwd, ["config", "branch.feature/parallel.t3-merge-base"]),
+          yield* git(cwd, ["config", "branch.feature/parallel.rosewood-merge-base"]),
           initialBranch,
         );
         for (const [configured, expected] of [
@@ -4343,7 +4348,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
 
           assert.equal(yield* git(worktreePath, ["rev-parse", "HEAD"]), commit);
           assert.equal(
-            yield* driver.readConfigValue(cwd, "branch.feature/revision.t3-merge-base"),
+            yield* driver.readConfigValue(cwd, "branch.feature/revision.rosewood-merge-base"),
             null,
           );
         }),
@@ -4364,20 +4369,20 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
             cwd,
             path: occupiedPath,
             refName: initialBranch,
-            newRefName: "t3/collide",
+            newRefName: "rosewood/collide",
           })
           .pipe(Effect.result);
 
         assert.isTrue(Result.isFailure(failed));
-        assert.equal(yield* git(cwd, ["branch", "--list", "t3/collide"]), "");
+        assert.equal(yield* git(cwd, ["branch", "--list", "rosewood/collide"]), "");
         const worktreePath = path.join(yield* makeTmpDir("git-worktrees-"), "retry");
         yield* driver.createWorktree({
           cwd,
           path: worktreePath,
           refName: initialBranch,
-          newRefName: "t3/collide",
+          newRefName: "rosewood/collide",
         });
-        assert.equal(yield* git(worktreePath, ["branch", "--show-current"]), "t3/collide");
+        assert.equal(yield* git(worktreePath, ["branch", "--show-current"]), "rosewood/collide");
       }),
     );
 
@@ -4453,7 +4458,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           const renamed = `${branch}-renamed`;
           assert.equal(yield* git(cwd, ["config", `branch.${renamed}.remote`]), "origin");
           assert.equal(
-            yield* git(cwd, ["config", `branch.${renamed}.t3-merge-base-ref`]),
+            yield* git(cwd, ["config", `branch.${renamed}.rosewood-merge-base-ref`]),
             `refs/remotes/origin/${initialBranch}`,
           );
         }
@@ -4479,7 +4484,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           });
 
           assert.equal(
-            yield* driver.readConfigValue(cwd, "branch.feature/branch.t3-merge-base"),
+            yield* driver.readConfigValue(cwd, "branch.feature/branch.rosewood-merge-base"),
             baseBranch,
           );
         }),
@@ -4792,7 +4797,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
       }),
     );
 
-    it.effect("resolves the submodule mode from the option, then t3.json", () =>
+    it.effect("resolves the submodule mode from the option, then rosewood.json", () =>
       Effect.gen(function* () {
         const fileSystem = yield* FileSystem.FileSystem;
         const pathService = yield* Path.Path;
@@ -4833,11 +4838,11 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           branch: string,
           submodules: WorktreeSubmodules | null = null,
         ) {
-          yield* writeTextFile(cwd, "t3.json", `{ "worktreeSubmodules": "${fileMode}" }`);
-          yield* git(cwd, ["add", "t3.json"]);
+          yield* writeTextFile(cwd, "rosewood.json", `{ "worktreeSubmodules": "${fileMode}" }`);
+          yield* git(cwd, ["add", "rosewood.json"]);
           yield* git(cwd, ["commit", "--allow-empty", "-m", `submodules: ${fileMode}`]);
           const worktreePath = pathService.join(worktreesDir, branch);
-          const disabled = yield* Ref.make<"settings" | "t3.json" | false>(false);
+          const disabled = yield* Ref.make<"settings" | "rosewood.json" | false>(false);
           yield* driver.createWorktree(
             { cwd, path: worktreePath, refName: initialBranch, newRefName: branch },
             {
@@ -4875,7 +4880,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           nested: false,
         });
         assert.deepEqual(yield* createWithMode("none", "none"), {
-          disabled: "t3.json",
+          disabled: "rosewood.json",
           inner: false,
           nested: false,
         });
@@ -4916,7 +4921,10 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           "# test\n",
         );
         assert.equal(
-          yield* driver.readConfigValue(worktreePath, "branch.feature/locked-config.t3-merge-base"),
+          yield* driver.readConfigValue(
+            worktreePath,
+            "branch.feature/locked-config.rosewood-merge-base",
+          ),
           null,
         );
         assert.equal(yield* fileSystem.exists(pathService.join(cwd, ".git/config.lock")), true);
@@ -5130,7 +5138,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
       Effect.gen(function* () {
         const cwd = yield* makeTmpDir();
         yield* git(cwd, ["init"]);
-        yield* git(cwd, ["remote", "add", "origin", "https://github.com/pingdotgg/t3code.git"]);
+        yield* git(cwd, ["remote", "add", "origin", "https://github.com/vaporwavie/rosewood.git"]);
         yield* git(cwd, ["config", "remote.origin.promisor", "true"]);
         yield* git(cwd, ["config", "remote.origin.partialclonefilter", "blob:none"]);
         const driver = yield* GitVcsDriver.GitVcsDriver;
@@ -5138,13 +5146,13 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         const reused = yield* driver.ensureRemote({
           cwd,
           preferredName: "origin",
-          url: "git@github.com:pingdotgg/t3code.git",
+          url: "git@github.com:vaporwavie/rosewood.git",
         });
         assert.equal(reused, "origin");
         const added = yield* driver.ensureRemote({
           cwd,
           preferredName: "origin",
-          url: "https://github.com/another-owner/t3code.git",
+          url: "https://github.com/another-owner/rosewood.git",
         });
         assert.equal(added, "origin-1");
       }),
@@ -5173,7 +5181,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
           Effect.provide(layerServerConfig),
         );
-        const input = { cwd, preferredName: "fork", url: "https://github.com/fork/t3code.git" };
+        const input = { cwd, preferredName: "fork", url: "https://github.com/fork/rosewood.git" };
 
         const names = yield* Effect.all([driver.ensureRemote(input), driver.ensureRemote(input)], {
           concurrency: "unbounded",
@@ -5192,17 +5200,17 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         const lockPath = path.join(cwd, ".git", "config.lock");
         yield* fileSystem.writeFileString(lockPath, "");
         const { driver, failures } = yield* makeDriverReleasingLock(
-          (args) => args[1] === "t3.test",
+          (args) => args[1] === "rosewood.test",
           lockPath,
         );
 
         // The retry waits on the real clock; the lock is already gone by then.
         yield* TestClock.withLive(
-          driver.writeConfigValue({ cwd, key: "t3.test", value: "written" }),
+          driver.writeConfigValue({ cwd, key: "rosewood.test", value: "written" }),
         );
 
         assert.equal(yield* Ref.get(failures), 1);
-        assert.equal(yield* git(cwd, ["config", "t3.test"]), "written");
+        assert.equal(yield* git(cwd, ["config", "rosewood.test"]), "written");
       }),
     );
 
@@ -5298,7 +5306,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         const driver = yield* GitVcsDriver.GitVcsDriver;
         const fileSystem = yield* FileSystem.FileSystem;
         // Remote names come from .git/config. Read as an option, this one runs `touch` in cwd.
-        const remoteName = "--upload-pack=touch${IFS}t3-marker;false";
+        const remoteName = "--upload-pack=touch${IFS}rosewood-marker;false";
         yield* git(remote, ["init", "--bare"]);
         yield* git(cwd, [
           "push",
@@ -5313,7 +5321,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         yield* driver.fetchRemote({ cwd, remoteName });
         const head = yield* driver.fetchRefCommit({ cwd, ref: "refs/pull/7/head" });
 
-        assert.isFalse(yield* fileSystem.exists((yield* Path.Path).join(cwd, "t3-marker")));
+        assert.isFalse(yield* fileSystem.exists((yield* Path.Path).join(cwd, "rosewood-marker")));
         assert.equal(head.commitSha, yield* git(cwd, ["rev-parse", "HEAD"]));
         assert.equal(
           yield* git(cwd, ["rev-parse", `refs/remotes/${remoteName}/${initialBranch}`]),
@@ -5328,47 +5336,47 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         yield* initRepoWithCommit(cwd);
         const driver = yield* GitVcsDriver.GitVcsDriver;
 
-        yield* git(cwd, ["remote", "add", "origin", "https://github.com/pingdotgg/t3code.git"]);
+        yield* git(cwd, ["remote", "add", "origin", "https://github.com/vaporwavie/rosewood.git"]);
 
         const reusedForSsh = yield* driver.ensureRemote({
           cwd,
           preferredName: "pingdotgg",
-          url: "git@github.com:pingdotgg/t3code.git",
+          url: "git@github.com:vaporwavie/rosewood.git",
         });
         assert.equal(reusedForSsh, "origin");
 
         const reusedForSshScheme = yield* driver.ensureRemote({
           cwd,
           preferredName: "pingdotgg",
-          url: "ssh://git@github.com/pingdotgg/t3code",
+          url: "ssh://git@github.com/vaporwavie/rosewood",
         });
         assert.equal(reusedForSshScheme, "origin");
 
         const reusedForBareSshScheme = yield* driver.ensureRemote({
           cwd,
           preferredName: "pingdotgg",
-          url: "ssh://github.com/pingdotgg/t3code",
+          url: "ssh://github.com/vaporwavie/rosewood",
         });
         assert.equal(reusedForBareSshScheme, "origin");
 
         const reusedForSshPort = yield* driver.ensureRemote({
           cwd,
           preferredName: "pingdotgg",
-          url: "ssh://git@github.com:22/pingdotgg/t3code",
+          url: "ssh://git@github.com:22/vaporwavie/rosewood",
         });
         assert.equal(reusedForSshPort, "origin");
 
         const reusedForSshWithPort = yield* driver.ensureRemote({
           cwd,
           preferredName: "pingdotgg",
-          url: "ssh://git@github.com:22/pingdotgg/t3code.git",
+          url: "ssh://git@github.com:22/vaporwavie/rosewood.git",
         });
         assert.equal(reusedForSshWithPort, "origin");
 
         const addedForFork = yield* driver.ensureRemote({
           cwd,
           preferredName: "octocat",
-          url: "git@github.com:octocat/t3code.git",
+          url: "git@github.com:octocat/rosewood.git",
         });
         assert.equal(addedForFork, "octocat");
         assert.equal(yield* git(cwd, ["remote"]), "octocat\norigin");
@@ -5832,7 +5840,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           cwd,
           path: worktreePath,
           refName: resolvedBase.commitSha,
-          newRefName: "t3code/fetched-origin",
+          newRefName: "rosewood/fetched-origin",
           baseRefName: resolvedBase.remoteRefName,
         });
 
@@ -5846,7 +5854,7 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           remoteHead,
         );
         assert.equal(
-          yield* driver.readConfigValue(worktreePath, "branch.t3code/fetched-origin.remote"),
+          yield* driver.readConfigValue(worktreePath, "branch.rosewood/fetched-origin.remote"),
           null,
         );
         const status = yield* driver.statusDetails(worktreePath);
@@ -5936,7 +5944,10 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
         assert.strictEqual(status.branchChanges?.deletions, 0);
         // gh pr create consumes this setting verbatim as the hosted target branch.
         assert.equal(
-          yield* driver.readConfigValue(worktreePath, "branch.feature/from-upstream.t3-merge-base"),
+          yield* driver.readConfigValue(
+            worktreePath,
+            "branch.feature/from-upstream.rosewood-merge-base",
+          ),
           "release",
         );
         assert.equal(changes.baseRef, "upstream/release");
@@ -6253,7 +6264,10 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           yield* git(cwd, ["rev-parse", "--abbrev-ref", "@{upstream}"]),
           "origin/feature/x",
         );
-        assert.equal(yield* driver.readConfigValue(cwd, "branch.feature/x.t3-merge-base"), "dev");
+        assert.equal(
+          yield* driver.readConfigValue(cwd, "branch.feature/x.rosewood-merge-base"),
+          "dev",
+        );
 
         const preview = yield* driver.getReviewDiffPreview({ cwd });
         const changes = preview.sources.find((source) => source.kind === "branch-range")!;

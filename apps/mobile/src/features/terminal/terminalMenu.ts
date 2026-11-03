@@ -1,10 +1,10 @@
-import { type KnownTerminalSession } from "@t3tools/client-runtime/state/terminal";
-import { DEFAULT_TERMINAL_ID, type ProjectScript } from "@t3tools/contracts";
-import { nextTerminalId, resolveTerminalSessionLabel } from "@t3tools/shared/terminalLabels";
+import { type KnownTerminalSession } from "@rosewood/client-runtime/state/terminal";
+import { DEFAULT_TERMINAL_ID, type ProjectScript } from "@rosewood/contracts";
+import { nextTerminalId, resolveTerminalSessionLabel } from "@rosewood/shared/terminalLabels";
 import * as Arr from "effect/Array";
 import * as Order from "effect/Order";
 
-export { resolveTerminalSessionLabel } from "@t3tools/shared/terminalLabels";
+export { resolveTerminalSessionLabel } from "@rosewood/shared/terminalLabels";
 
 export interface TerminalMenuSession {
   readonly terminalId: string;

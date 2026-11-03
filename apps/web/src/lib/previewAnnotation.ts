@@ -1,4 +1,4 @@
-import type { PreviewAnnotationPayload } from "@t3tools/contracts";
+import type { PreviewAnnotationPayload } from "@rosewood/contracts";
 
 import { dataUrlToFile } from "./imageCompression";
 

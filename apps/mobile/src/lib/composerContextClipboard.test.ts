@@ -4,12 +4,12 @@ import {
   ComposerContextId,
   EnvironmentId,
   ThreadId,
-} from "@t3tools/contracts";
-import { encodeComposerContextFragment } from "@t3tools/shared/composerContextClipboard";
+} from "@rosewood/contracts";
+import { encodeComposerContextFragment } from "@rosewood/shared/composerContextClipboard";
 import {
   collectComposerContextReferences,
   formatComposerContextReference,
-} from "@t3tools/shared/composerContextReferences";
+} from "@rosewood/shared/composerContextReferences";
 
 const mocks = vi.hoisted(() => ({
   execute: vi.fn(),
@@ -46,7 +46,7 @@ vi.mock("../state/use-composer-drafts", () => ({
   waitForComposerDraftsLoaded: async () => {},
   findLocalComposerClipboardAttachment: mocks.local,
 }));
-vi.mock("@t3tools/client-runtime/state/runtime", () => ({
+vi.mock("@rosewood/client-runtime/state/runtime", () => ({
   executeAtomQuery: mocks.execute,
   squashAtomCommandFailure: () => new Error("offline"),
 }));
@@ -83,7 +83,7 @@ const terminal = {
   text: "Build failed",
 };
 const clipboard = {
-  text: "![Checkout](t3-context://v1/image/image-source) [Build](t3-context://v1/terminal/terminal-source)",
+  text: "![Checkout](rosewood-context://v1/image/image-source) [Build](rosewood-context://v1/terminal/terminal-source)",
   fragment: encodeComposerContextFragment({
     version: 1,
     source: { environmentId: EnvironmentId.make("source") },
@@ -179,7 +179,7 @@ describe("mobile context clipboard imports", () => {
     const controller = new AbortController();
     mocks.dispose.mockImplementationOnce(() => controller.abort());
     const imageOnly = {
-      text: "![Checkout](t3-context://v1/image/image-source)",
+      text: "![Checkout](rosewood-context://v1/image/image-source)",
       fragment: encodeComposerContextFragment({
         version: 1,
         source: { environmentId: EnvironmentId.make("source") },

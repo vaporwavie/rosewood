@@ -1,6 +1,6 @@
-import type { ThreadId, TurnItemId } from "@t3tools/contracts";
+import type { ThreadId, TurnItemId } from "@rosewood/contracts";
 import * as Context from "effect/Context";
-import * as NodeSqliteClient from "@t3tools/shared/nodeSqliteClient";
+import * as NodeSqliteClient from "@rosewood/shared/nodeSqliteClient";
 import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -36,7 +36,7 @@ export class McpAppModelContext extends Context.Service<
       threadId: ThreadId,
     ) => Effect.Effect<ReadonlyArray<McpAppModelContextEntry>, McpAppModelContextError>;
   }
->()("t3/mcpApps/McpAppModelContext") {}
+>()("rosewood/mcpApps/McpAppModelContext") {}
 
 export const layer = Layer.effect(
   McpAppModelContext,

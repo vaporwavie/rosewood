@@ -12,7 +12,7 @@ import {
   type AgentSessionProjectGit,
   type AgentSessionScanResult,
   type ProviderInstanceConfig,
-} from "@t3tools/contracts";
+} from "@rosewood/contracts";
 import * as Clock from "effect/Clock";
 import * as Context from "effect/Context";
 import * as DateTime from "effect/DateTime";
@@ -25,18 +25,18 @@ import * as Schema from "effect/Schema";
 import * as Semaphore from "effect/Semaphore";
 import * as Stream from "effect/Stream";
 
-import { isBareGitConfig, parseOriginUrlFromGitConfig } from "@t3tools/shared/git";
-import * as HostProcess from "@t3tools/shared/HostProcess";
-import { normalizeProjectPathForComparison } from "@t3tools/shared/path";
-import { repositoryPathFromRemoteUrl } from "@t3tools/source-control-core/server/SourceControlProvider";
+import { isBareGitConfig, parseOriginUrlFromGitConfig } from "@rosewood/shared/git";
+import * as HostProcess from "@rosewood/shared/HostProcess";
+import { normalizeProjectPathForComparison } from "@rosewood/shared/path";
+import { repositoryPathFromRemoteUrl } from "@rosewood/source-control-core/server/SourceControlProvider";
 
 import * as ServerConfig from "../config.ts";
 import * as ProcessRunner from "../processRunner.ts";
 import * as ProjectStore from "../orchestration-v2/ProjectStore.ts";
 import { resolveCodexHomeLayout } from "../provider/Drivers/CodexHomeLayout.ts";
-import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/instanceEnvironment";
-import { expandHomePath } from "@t3tools/provider-core/server/pathExpansion";
-import { resolvePiSessionsDir } from "@t3tools/provider-pi/server/usage";
+import { mergeProviderInstanceEnvironment } from "@rosewood/provider-core/server/instanceEnvironment";
+import { expandHomePath } from "@rosewood/provider-core/server/pathExpansion";
+import { resolvePiSessionsDir } from "@rosewood/provider-pi/server/usage";
 import * as ServerSettings from "../serverSettings.ts";
 import { sourceControlDefinitions } from "../sourceControl/sourceControlDefinitions.ts";
 import {
@@ -194,7 +194,7 @@ export class AgentSessionScanner extends Context.Service<
       completedSources?: ReadonlyArray<AgentSessionImportSource>,
     ) => Stream.Stream<AgentSessionRecentThread, AgentSessionScanError>;
   }
->()("t3/project/AgentSessionScanner") {}
+>()("rosewood/project/AgentSessionScanner") {}
 
 type AgentSessionSource = AgentSessionProjectCandidate["sources"][number];
 
@@ -646,7 +646,7 @@ function normalizeForWorktreeMatch(value: string, caseFold: boolean): string {
   return caseFold ? normalized.toLowerCase() : normalized;
 }
 
-function isT3ManagedWorktree(
+function isRosewoodManagedWorktree(
   candidatePath: string,
   worktreesDir: string,
   caseFold: boolean,
@@ -654,7 +654,7 @@ function isT3ManagedWorktree(
   const normalized = normalizeForWorktreeMatch(candidatePath, caseFold);
   return (
     normalized.startsWith(normalizeForWorktreeMatch(worktreesDir, caseFold)) ||
-    normalized.includes("/.t3/worktrees/")
+    normalized.includes("/.rosewood/worktrees/")
   );
 }
 
@@ -769,7 +769,7 @@ export const make = Effect.gen(function* () {
     normalizeForWorktreeMatch(candidatePath, foldWorktreeCase).startsWith(
       normalizeForWorktreeMatch(baseDir, foldWorktreeCase),
     ) ||
-    isT3ManagedWorktree(candidatePath, worktreesDir, foldWorktreeCase);
+    isRosewoodManagedWorktree(candidatePath, worktreesDir, foldWorktreeCase);
 
   const listDirectory = (directory: string) =>
     fileSystem.readDirectory(directory).pipe(Effect.orElseSucceed((): ReadonlyArray<string> => []));

@@ -1,1 +1,1 @@
-export { providerClients } from "@t3tools/client-runtime/provider-clients";
+export { providerClients } from "@rosewood/client-runtime/provider-clients";

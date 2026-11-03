@@ -1,9 +1,9 @@
-import type { OrchestrationV2CommandOutputFrame } from "@t3tools/contracts";
+import type { OrchestrationV2CommandOutputFrame } from "@rosewood/contracts";
 import {
   appendTerminalOutput,
   EMPTY_TERMINAL_OUTPUT,
   type TerminalOutputState,
-} from "@t3tools/shared/terminalOutput";
+} from "@rosewood/shared/terminalOutput";
 
 /** One command row's output as a client holds it. */
 export interface CommandOutputView {

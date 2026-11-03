@@ -62,10 +62,10 @@ import {
   type ServerProviderModel,
   ThreadId,
   isOrchestrationV2WorkActive,
-} from "@t3tools/contracts";
-import { getProviderOptionCurrentValue } from "@t3tools/shared/model";
-import { runRanAfter } from "@t3tools/shared/orchestrationV2ThreadError";
-import { formatThreadLink } from "@t3tools/shared/threadLinks";
+} from "@rosewood/contracts";
+import { getProviderOptionCurrentValue } from "@rosewood/shared/model";
+import { runRanAfter } from "@rosewood/shared/orchestrationV2ThreadError";
+import { formatThreadLink } from "@rosewood/shared/threadLinks";
 import {
   normalizeThreadPullRequestKey,
   visibleThreadPullRequests,
@@ -87,7 +87,7 @@ import * as ProviderAdapterRegistry from "../orchestration-v2/ProviderAdapterReg
 import {
   subagentResultForRun,
   delegatedTaskProgress,
-} from "@t3tools/provider-core/server/subagentProjection";
+} from "@rosewood/provider-core/server/subagentProjection";
 import {
   DispatchModeLimit,
   type DispatchModeRefusal,
@@ -218,7 +218,7 @@ export interface OrchestratorMcpServiceShape {
 export class OrchestratorMcpService extends Context.Service<
   OrchestratorMcpService,
   OrchestratorMcpServiceShape
->()("t3/mcp/OrchestratorMcpService") {}
+>()("rosewood/mcp/OrchestratorMcpService") {}
 
 const isThreadManagementError = Schema.is(ThreadManagementService.ThreadManagementError);
 
@@ -372,7 +372,7 @@ function providerConstraints(
   return constraints;
 }
 
-/** t3_thread_launch keeps a selection as given, so it can hold options its model does not have. */
+/** rw_thread_launch keeps a selection as given, so it can hold options its model does not have. */
 function knownOptions(
   options: ReadonlyArray<ProviderOptionSelection> | undefined,
   descriptors: ReadonlyArray<ProviderOptionDescriptor> | undefined,
@@ -1175,7 +1175,7 @@ const make = Effect.gen(function* () {
         : Effect.fail(
             failure(
               "target_required",
-              "Pass projectId: this MCP client is not running inside a T3 thread.",
+              "Pass projectId: this MCP client is not running inside a Rosewood thread.",
             ),
           );
 
@@ -1991,7 +1991,7 @@ const make = Effect.gen(function* () {
         return yield* failure(
           "invalid_request",
           parent === undefined
-            ? "bindToCurrentThread needs an agent running inside a T3 thread."
+            ? "bindToCurrentThread needs an agent running inside a Rosewood thread."
             : "bindToCurrentThread binds to this thread, which belongs to a different project.",
         );
       }
@@ -2065,7 +2065,7 @@ const make = Effect.gen(function* () {
           return yield* failure(
             "invalid_request",
             parent === undefined
-              ? "bindToCurrentThread needs an agent running inside a T3 thread."
+              ? "bindToCurrentThread needs an agent running inside a Rosewood thread."
               : "bindToCurrentThread binds to this thread, which belongs to a different project.",
           );
         }

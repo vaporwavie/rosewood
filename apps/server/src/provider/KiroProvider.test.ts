@@ -1,7 +1,7 @@
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, describe, it } from "@effect/vitest";
-import { KiroSettings } from "@t3tools/provider-kiro/settings";
+import { KiroSettings } from "@rosewood/provider-kiro/settings";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -15,7 +15,7 @@ import {
   checkKiroProviderStatus,
   kiroAgentDescriptor,
   kiroDefaultModelId,
-} from "@t3tools/provider-kiro/testing";
+} from "@rosewood/provider-kiro/testing";
 
 const encoder = new TextEncoder();
 const settings = Schema.decodeSync(KiroSettings)({ enabled: true });

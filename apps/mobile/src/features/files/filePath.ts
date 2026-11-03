@@ -1,10 +1,10 @@
-import type { FilesystemEntryMetadata } from "@t3tools/contracts";
-import { filePreviewDelimiter } from "@t3tools/shared/delimitedPreview";
-import { joinPath, resolvePathLinkTarget } from "@t3tools/shared/fileLinks";
+import type { FilesystemEntryMetadata } from "@rosewood/contracts";
+import { filePreviewDelimiter } from "@rosewood/shared/delimitedPreview";
+import { joinPath, resolvePathLinkTarget } from "@rosewood/shared/fileLinks";
 import {
   isWorkspaceAudioPreviewPath,
   isWorkspaceVideoPreviewPath,
-} from "@t3tools/shared/filePreview";
+} from "@rosewood/shared/filePreview";
 
 function isWindowsAbsolutePath(value: string): boolean {
   return /^[A-Za-z]:[\\/]/.test(value) || value.startsWith("\\\\");

@@ -1,12 +1,12 @@
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
-import { NonNegativeInt, TextGenerationError } from "@t3tools/contracts";
+import { NonNegativeInt, TextGenerationError } from "@rosewood/contracts";
 import type { OpenCodeSettings } from "../settings.ts";
-import { getModelSelectionStringOptionValue } from "@t3tools/shared/model";
+import { getModelSelectionStringOptionValue } from "@rosewood/shared/model";
 
-import * as ProviderHost from "@t3tools/provider-core/server/ProviderHost";
-import * as TextGenerationOperations from "@t3tools/provider-core/server/textGenerationOperations";
+import * as ProviderHost from "@rosewood/provider-core/server/ProviderHost";
+import * as TextGenerationOperations from "@rosewood/provider-core/server/textGenerationOperations";
 import * as OpenCodeRuntime from "./OpenCodeRuntime.ts";
 import * as OpenCodeServerOwner from "./OpenCodeServerOwner.ts";
 
@@ -191,7 +191,7 @@ export const makeOpenCodeTextGeneration = Effect.fn("makeOpenCodeTextGeneration"
           try: (signal) =>
             client.session.create(
               {
-                title: `T3 Code ${input.operation}`,
+                title: `Rosewood ${input.operation}`,
                 // OpenCode Zen refuses free-model requests that carry no tools, so keep read.
                 permission: [
                   { permission: "*", pattern: "*", action: "deny" },

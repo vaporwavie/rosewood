@@ -5,12 +5,12 @@ import {
   MAX_SNOOZE_PRESETS,
   SnoozePresetDay,
   type SnoozePresetSetting,
-} from "@t3tools/contracts/settings";
+} from "@rosewood/contracts/settings";
 import {
   resolveSnoozePreset,
   resolveSnoozePresets,
   snoozePresetId,
-} from "@t3tools/client-runtime/state/thread-settled";
+} from "@rosewood/client-runtime/state/thread-settled";
 import * as Equal from "effect/Equal";
 import * as Schema from "effect/Schema";
 import { PlusIcon, XIcon } from "lucide-react";

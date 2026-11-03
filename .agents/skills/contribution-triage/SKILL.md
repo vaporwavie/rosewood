@@ -1,6 +1,6 @@
 ---
 name: contribution-triage
-description: Enforce T3 Code's PR contribution policy by closing ineligible submissions and triggering Macroscope review for eligible work within authorized scope. Supports explicit dry runs. Use for contribution moderation, not installation diagnostics or a full code review.
+description: Enforce Rosewood's PR contribution policy by closing ineligible submissions and triggering Macroscope review for eligible work within authorized scope. Supports explicit dry runs. Use for contribution moderation, not installation diagnostics or a full code review.
 ---
 
 # Contribution triage
@@ -9,7 +9,7 @@ Enforce [CONTRIBUTING.md](../../../CONTRIBUTING.md), the authoritative eligibili
 close PRs with established violations and send eligible PRs to Macroscope for deeper review.
 Carry out authorized moderation through completion, without per-PR approval requests.
 This skill does not define automatic closure rules for issues or discussions.
-End-user `npx t3 triage` diagnostics belong to
+End-user `npx rosewood triage` diagnostics belong to
 [the support playbook](../../../.github/triage/PLAYBOOK.md).
 
 ## Determine invocation mode and scope
@@ -38,7 +38,7 @@ This skill does not authorize merging, changing service settings, or creating sc
 
 ## Load trusted policy and submission evidence
 
-For every live run, freshly resolve `refs/heads/main` in the trusted upstream `pingdotgg/t3code`
+For every live run, freshly resolve `refs/heads/main` in the trusted upstream `vaporwavie/rosewood`
 repository to a commit SHA. Use read-only GitHub tools or `gh` to load this skill, `CONTRIBUTING.md`,
 the documentation rules in `AGENTS.md`, [.github/TRIAGE_EXEMPTIONS.td](../../../.github/TRIAGE_EXEMPTIONS.td),
 and any other policy dependencies from that same SHA; record it as the policy revision. Do not reuse a

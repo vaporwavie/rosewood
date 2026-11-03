@@ -5,11 +5,11 @@ import type {
   OrchestrationV2TurnItem,
   ThreadId,
   ThreadPullRequestLink,
-} from "@t3tools/contracts";
-import { isOrchestrationV2WorkActive } from "@t3tools/contracts";
+} from "@rosewood/contracts";
+import { isOrchestrationV2WorkActive } from "@rosewood/contracts";
 import * as Predicate from "effect/Predicate";
 
-import { resolveT3McpToolId } from "./t3McpToolPresentation.ts";
+import { resolveRosewoodMcpToolId } from "./rosewoodMcpToolPresentation.ts";
 
 const BACKGROUND_TURN_ITEM_TYPES = new Set<OrchestrationV2TurnItem["type"]>([
   "command_execution",
@@ -70,9 +70,9 @@ export function deriveBlockedOnThreadWait(input: {
       continue;
     }
     if (item.type !== "dynamic_tool") return false;
-    const tool = resolveT3McpToolId(item.toolName);
+    const tool = resolveRosewoodMcpToolId(item.toolName);
     if (
-      tool !== "t3_thread_wait" &&
+      tool !== "rw_thread_wait" &&
       !(
         tool === "delegate_task" &&
         Predicate.isObject(item.input) &&

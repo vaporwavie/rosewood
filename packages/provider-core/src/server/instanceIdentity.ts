@@ -1,7 +1,7 @@
-import type { ProviderDriverKind, ServerProvider } from "@t3tools/contracts";
+import type { ProviderDriverKind, ServerProvider } from "@rosewood/contracts";
 
-import type { ProviderInstance } from "@t3tools/provider-core/server/driver";
-import type { ServerProviderDraft } from "@t3tools/provider-core/server/snapshotProbe";
+import type { ProviderInstance } from "@rosewood/provider-core/server/driver";
+import type { ServerProviderDraft } from "@rosewood/provider-core/server/snapshotProbe";
 
 export const withInstanceIdentity =
   (input: {
