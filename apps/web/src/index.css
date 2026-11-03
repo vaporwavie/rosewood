@@ -164,6 +164,10 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(rosewood
   );
 }
 
+.electron-compositor-chrome {
+  --workspace-topbar-height: 40px;
+}
+
 /* The font tokens are declared outside the inline theme so utilities reference
    the variables and Settings -> Appearance can override them at runtime. The
    default stacks are mirrored in `appearanceFonts.ts`. */
@@ -1908,6 +1912,11 @@ code {
 /* Window drag region (frameless titlebar) */
 .drag-region {
   -webkit-app-region: drag;
+}
+
+/* The compositor moves windows; a drag or double-click here would fight its layout. */
+.electron-compositor-chrome .drag-region {
+  -webkit-app-region: no-drag;
 }
 
 /* Electron 44 inherits app-region. Reset children to the initial value so they
