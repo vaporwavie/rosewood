@@ -8,7 +8,7 @@ upstream/main ──(rebrand.mjs)──> rosewood/upstream ──(merge)──> 
 
 - `rosewood/upstream` is generated. Each commit is upstream's tree after `rebrand.mjs`, with an `Upstream-Commit` trailer. Never commit to it by hand.
 - `main` is yours. Work there or on branches off it. Merges only conflict where you and upstream edited the same lines.
-- `rosewood-sync.yml` runs daily and pushes the merge to `main`. On a conflict it leaves `main` alone and opens an issue.
+- `rosewood-sync.yml` runs daily and pushes the merge to `main`. On a conflict it leaves `main` alone and fails the run, so GitHub emails you. The run summary lists the files.
 
 ## Commands
 
@@ -55,6 +55,6 @@ MCP tools are `rw_*` rather than `rosewood_*`, because parsers strip a `rosewood
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Upstream adds a new name shape        | The leak check in `rebrand.mjs` fails the sync; `main` is untouched                                                |
 | Upstream moves the telemetry defaults | The patch match count fails the sync; `main` is untouched                                                          |
-| You and upstream edit the same line   | The workflow opens an issue listing the files                                                                      |
+| You and upstream edit the same line   | The workflow fails and its summary lists the files                                                                 |
 | Upstream edits a workflow             | The rebrand moves them to `.github/upstream-workflows/`, where they never run and the Action's token can push them |
 | A clean merge still breaks the build  | Not caught automatically, so run `vp run typecheck` before rebuilding your install                                 |

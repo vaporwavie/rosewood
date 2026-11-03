@@ -1,0 +1,60 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rosewood-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          filter: blob:none
+
+      - uses: ./.github/actions/setup-ci-deps
+        with:
+          install-args: --filter @rosewood/monorepo
+
+      - name: Configure git
+        run: |
+          git config user.name "rosewood-sync[bot]"
+          git config user.email "${GITHUB_REPOSITORY_OWNER}@users.noreply.github.com"
+          git fetch --no-tags origin "+refs/heads/rosewood/upstream:refs/heads/rosewood/upstream"
+
+      - name: Rebuild rebranded upstream
+        run: rosewood/sync.sh
+
+      - name: Push rebranded upstream
+        run: git push origin rosewood/upstream
+
+      - name: Merge into main
+        run: |
+          if git merge --no-edit -m "chore(rosewood): sync upstream" rosewood/upstream; then
+            git push origin main
+            exit 0
+          fi
+          {
+            echo "Upstream changed the same lines as main. Run locally:"
+            echo
+            echo '```bash'
+            echo "git switch main && git pull && rosewood/sync.sh --merge"
+            echo '```'
+            echo
+            echo "Conflicting files:"
+            echo
+            git diff --name-only --diff-filter=U | sed 's/^/- `/; s/$/`/'
+          } >> "$GITHUB_STEP_SUMMARY"
+          git merge --abort
+          exit 1
