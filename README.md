@@ -12,3 +12,11 @@ vp run dev
 ```
 
 State lives in `~/.rosewood`, separate from any T3 Code install. Telemetry is off by default.
+
+## Desktop build
+
+The Linux desktop build needs libsecret headers (`libsecret-devel` on Fedora, `libsecret-1-dev` on Debian).
+
+```bash
+vp run dist:desktop:linux
+```
