@@ -1,27 +1,20 @@
 {
   "fill": {
-    "solid": "display-p3:0.39913,0.12080,0.14909,1.00000"
+    "solid": "display-p3:0.63000,0.19000,0.25000,1.00000"
   },
   "groups": [
     {
       "layers": [
         {
-          "image-name": "text.svg",
-          "name": "Text",
+          "glass": false,
+          "image-name": "background.svg",
+          "name": "Background",
           "position": {
-            "scale": 8.5,
+            "scale": 8.1,
             "translation-in-points": [0, 0]
           }
         }
-      ],
-      "shadow": {
-        "kind": "neutral",
-        "opacity": 0.5
-      },
-      "translucency": {
-        "enabled": true,
-        "value": 0.5
-      }
+      ]
     }
   ],
   "supported-platforms": {

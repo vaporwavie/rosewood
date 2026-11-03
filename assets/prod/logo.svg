@@ -1,4 +1,11 @@
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0 10C0 4.47715 4.47715 0 10 0H118C123.523 0 128 4.47715 128 10V118C128 123.523 123.523 128 118 128H10C4.47715 128 0 123.523 0 118V10Z" fill="#6F1724"/>
-<path d="M38.318 37H66.798C77.987 37 85.107 44.12 85.107 55.309C85.107 63.446 80.53 69.549 73.41 72.092L87.141 93.96H71.884L59.678 73.617H51.541V93.96H38.318V37ZM51.541 48.189V62.428H65.781C69.849 62.428 71.884 59.377 71.884 55.309C71.884 51.24 69.849 48.189 65.781 48.189H51.541Z" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs><linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9525F"/><stop offset="1" stop-color="#A0303F"/></linearGradient></defs>
+  <clipPath id="tile"><rect width="128" height="128" rx="28"/></clipPath>
+  <g clip-path="url(#tile)"><rect width="128" height="128" fill="url(#wood)"/><g fill="none" stroke="#000" stroke-opacity=".14" stroke-width="1.6" stroke-linecap="round">
+    <path d="M-4 20C30 12 58 30 132 14"/>
+    <path d="M-4 44C24 34 46 56 132 40"/>
+    <path d="M-4 72C36 62 74 88 132 66"/>
+    <path d="M-4 96C28 88 60 110 132 92"/>
+    <path d="M-4 118C40 110 84 128 132 112"/>
+  </g></g>
 </svg>

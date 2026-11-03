@@ -46,7 +46,7 @@ const DEVELOPMENT_ASSETS = {
   androidSplashIcon: "./assets/android-splash-icon-dev.png",
   androidMonochromeIcon: "./assets/android-icon-mark.png",
   androidNotificationIcon: "./assets/android-notification-icon.png",
-  androidNotificationColor: "#872330",
+  androidNotificationColor: "#A0303F",
 } as const;
 
 const PREVIEW_ASSETS = {
@@ -54,12 +54,12 @@ const PREVIEW_ASSETS = {
   iosIcon: fromRepoRoot(BRAND_ASSET_PATHS.nightlyIconComposerProject),
   splashIcon: fromRepoRoot(BRAND_ASSET_PATHS.nightlyIosIconPng),
   androidAdaptiveForeground,
-  androidAdaptiveBackgroundColor: "#170A08",
+  androidAdaptiveBackgroundColor: "#A0303F",
   androidAdaptiveBackgroundImage: "./assets/android-icon-background-nightly.png",
   androidSplashIcon: "./assets/android-splash-icon-nightly.png",
   androidMonochromeIcon: "./assets/android-icon-mark.png",
   androidNotificationIcon: "./assets/android-notification-icon.png",
-  androidNotificationColor: "#F2A6A8",
+  androidNotificationColor: "#A0303F",
 } as const;
 
 const RELEASE_ASSETS = {
@@ -67,12 +67,12 @@ const RELEASE_ASSETS = {
   iosIcon: fromRepoRoot(BRAND_ASSET_PATHS.productionIconComposerProject),
   splashIcon: fromRepoRoot(BRAND_ASSET_PATHS.productionIosIconPng),
   androidAdaptiveForeground,
-  androidAdaptiveBackgroundColor: "#4E0F19",
-  androidAdaptiveBackgroundImage: undefined,
+  androidAdaptiveBackgroundColor: "#A0303F",
+  androidAdaptiveBackgroundImage: "./assets/android-icon-background-prod.png",
   androidSplashIcon: "./assets/android-splash-icon-prod.png",
   androidMonochromeIcon: "./assets/android-icon-mark.png",
   androidNotificationIcon: "./assets/android-notification-icon.png",
-  androidNotificationColor: "#B73F4B",
+  androidNotificationColor: "#A0303F",
 } as const;
 
 const VARIANT_CONFIG = {
