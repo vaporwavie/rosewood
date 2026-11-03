@@ -32,6 +32,14 @@ Edit the rules in `rebrand.mjs`, then run `rosewood/sync.sh --merge`. The script
 
 `rosewood/generate-icons.sh` draws the placeholder desktop and web icons into `overlay/`. Edit its colors or mark, rerun it, then sync. The mark used in the UI is `NEW_MARK_PATH` in `rebrand.mjs`. Mobile launcher PNGs in `apps/mobile/assets` still show the old mark.
 
+## Palette
+
+`palette.mjs` holds the default theme. `rebrand.mjs` applies it, so upstream edits to those lines never conflict with `main`. After changing it, sync, then regenerate what derives from it on `main`:
+
+```bash
+vp run --filter @rosewood/mobile generate
+```
+
 ## Names that stay
 
 Some `t3` spellings are deliberate:

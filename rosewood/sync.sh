@@ -25,7 +25,7 @@ if [[ -z "${ROSEWOOD_UPSTREAM_REF:-}" ]]; then
   git fetch --quiet --no-tags "$UPSTREAM_URL" "+refs/heads/main:$UPSTREAM_REF"
 fi
 upstream_commit="$(git rev-parse "$UPSTREAM_REF^{commit}")"
-rules_hash="$(cd "$repo_root" && { cat rosewood/rebrand.mjs rosewood/sync.sh; find rosewood/overlay -type f | LC_ALL=C sort | xargs cat; } | sha256sum | cut -c1-16)"
+rules_hash="$(cd "$repo_root" && { cat rosewood/rebrand.mjs rosewood/palette.mjs rosewood/sync.sh; find rosewood/overlay -type f | LC_ALL=C sort | xargs cat; } | sha256sum | cut -c1-16)"
 
 base_parent=""
 current=""

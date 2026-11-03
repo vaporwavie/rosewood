@@ -5,6 +5,8 @@ import * as NodeFS from "node:fs";
 import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 
+import { PALETTE_PATCHES } from "./palette.mjs";
+
 const OWNER = "vaporwavie";
 const REPO = `${OWNER}/rosewood`;
 const REVERSE_DNS = `io.github.${OWNER}`;
@@ -167,6 +169,7 @@ const PATCHES = [
       ".github/upstream-workflows/release.yml",
     ],
   ].map(([file, find, replace]) => ({ file, find, replace, optional: true })),
+  ...PALETTE_PATCHES,
 ];
 
 const LEGACY_BRANCH = /t3code(?=\(\?:\[-\/\]\$\{TEMP_WORKTREE_HEX|[-/]deadbeef|\/f4ae4e0e)/g;
