@@ -398,7 +398,7 @@ export function getStandardThemeColors(appearance: ThemeAppearance): ThemeColors
   if (appearance === "dark") {
     return (standardDarkThemeColors ??= decodeThemeColors({
       ...ROSEWOOD_DARK_THEME_COLORS,
-      canvas: "#000000",
+      canvas: "#140a08",
     }));
   }
   return (standardLightThemeColors ??= decodeThemeColors(ROSEWOOD_LIGHT_THEME_COLORS));
@@ -406,8 +406,8 @@ export function getStandardThemeColors(appearance: ThemeAppearance): ThemeColors
 
 // index.css paints the light bubble a step darker than the shared palette mobile uses.
 const STANDARD_WEB_PAINTED_COLORS: Record<ThemeAppearance, Partial<ThemeColors>> = {
-  light: { messageSurface: "#ebebed" },
-  dark: { canvas: "#000000", messageSurface: "#1e1e1e" },
+  light: { messageSurface: "#f1e3df" },
+  dark: { canvas: "#140a08", messageSurface: "#2a1d19" },
 };
 
 /** The standard theme as index.css paints it, for solves that measure the page. */
